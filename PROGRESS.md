@@ -13,7 +13,7 @@ Status: in progress
 - [x] Add a tag-checked Trusted Publishing workflow.
 - [x] Verify release metadata in a built wheel.
 - [x] Document and hand off the one-time release configuration.
-- [ ] Configure the maintainer-controlled GitHub environment and pending PyPI
+- [x] Configure the maintainer-controlled GitHub environment and pending PyPI
   publisher.
 - [ ] Publish and verify the first public release.
 
@@ -68,6 +68,13 @@ Release hand-off checkpoint:
 - Documented the exact GitHub `pypi` environment and PyPI pending-publisher
   fields, stable tag/release flow, post-publication checks, and immutable-file
   recovery rule.
+- Verified the maintainer-created `pypi` environment: deployments are limited
+  to tags matching `v*`, publishing requires review by `thms-rmb`, and the
+  reviewer may approve their own deployment. The pending PyPI publisher was
+  configured by the maintainer for this environment and release workflow.
+- Limited direct `Platform wheels` push runs to branches. A published release
+  still calls the reusable workflow at its tag, but pushing the tag itself no
+  longer starts a duplicate five-platform build.
 
 ## Completed milestones
 
