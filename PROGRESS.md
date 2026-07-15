@@ -13,7 +13,7 @@ Status: in progress
 - [x] Build and inspect a platform-specific wheel.
 - [x] Test an installed wheel without Java or repository-path overrides.
 - [x] Add supported-platform CI build and test jobs.
-- [ ] Complete public usage, build, and release documentation.
+- [x] Complete public usage, build, and release documentation.
 
 macOS ARM64 wheel checkpoint:
 
@@ -41,6 +41,17 @@ Cross-platform CI checkpoint:
   upload their platform wheel for later release assembly.
 - The workflow YAML parses locally. Cross-platform execution remains to be
   verified after the repository is available to GitHub Actions.
+
+Documentation checkpoint:
+
+- Expanded the README with the pre-release status, runtime requirements,
+  complete OCR and inspection examples, coordinate semantics, options,
+  behavior, limits, and exception guidance.
+- Added reproducible local build/test/wheel instructions, including use of the
+  Homebrew GraalVM prefix without changing global `PATH`.
+- Added a dependency-free Textract mapping example and a release checklist
+  that separates local verification from maintainer-controlled GitHub/PyPI
+  configuration.
 
 ## Completed milestones
 
@@ -255,3 +266,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Added crop-relative OCR coordinate mapping across every supported PDF rotation and OCR orientation.
 - 2026-07-15: Added the PDFBox OCR writer with fitted invisible text, a pinned embeddable font, confidence filtering, permission handling, and output-preservation tests.
 - 2026-07-15: Completed M5 by connecting OCR to the native ABI, bundling the required Native Image resources, expanding the C smoke test, and passing the real Python transformation path.
+- 2026-07-15: Added a verified self-contained macOS ARM64 wheel build, installed-wheel smoke test, five-platform wheel CI matrix, and public build/usage/release documentation.
