@@ -1,4 +1,9 @@
 {
+  "resources": [
+    {
+      "glob": "dev/pypdftools/fonts/NotoSans-Regular.ttf"
+    }
+  ],
   "reflection": [
     {
       "condition": {

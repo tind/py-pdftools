@@ -10,8 +10,8 @@ Status: in progress
 
 - [x] Validate the OCR request independently in Java.
 - [x] Convert normalized OCR rectangles into PDF page coordinates.
-- [ ] Fit and write invisible Unicode text without changing visible content.
-- [ ] Preserve metadata, page geometry, and existing page content.
+- [x] Fit and write invisible Unicode text without changing visible content.
+- [x] Preserve metadata, page geometry, and existing page content.
 - [ ] Exercise transformation through the native ABI and Python API.
 
 Request-schema checkpoint:
@@ -31,6 +31,21 @@ Coordinate-mapping checkpoint:
   orientations 0/90/180/270 without Python-side derotation.
 - `./gradlew --offline :java:test --tests
   dev.pypdftools.ocr.PageCoordinateMapperTest` — 9 focused tests passed.
+
+PDFBox transformation checkpoint:
+
+- Bundled the static Noto Sans Regular font at a pinned upstream revision with
+  its SIL Open Font License and SHA-256 checksum.
+- The transformer filters blank and low-confidence lines, fits eligible text
+  to the OCR reading direction, appends a new content stream, and uses PDF
+  rendering mode 3 for normal invisible output.
+- The font is subset and embedded. Latin, Greek, and Cyrillic text round-trips
+  through PDFBox extraction; unsupported glyphs fail with `FontException`.
+- Tests reopen transformed files and verify document information, page count,
+  media/crop boxes, page rotation, existing text, rendering modes, page
+  matching, encryption permissions, and every page-rotation/OCR-orientation
+  combination.
+- `./gradlew --offline :java:test` — 61 Java tests passed.
 
 ## Completed milestones
 
@@ -185,3 +200,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Completed M4 with exported GraalVM entry points, managed native buffers and errors, a macOS ARM64 shared library build, an independent C ABI smoke test, and real Python-to-PDFBox inspection.
 - 2026-07-15: Added the first M5 checkpoint with strict native OCR request decoding, independent validation, resource limits, and PDF page-matching rules.
 - 2026-07-15: Added crop-relative OCR coordinate mapping across every supported PDF rotation and OCR orientation.
+- 2026-07-15: Added the PDFBox OCR writer with fitted invisible text, a pinned embeddable font, confidence filtering, permission handling, and output-preservation tests.
