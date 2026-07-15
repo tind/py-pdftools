@@ -10,7 +10,7 @@ Status: in progress
 
 - [x] Select the project and distribution licenses.
 - [x] Select the public PyPI distribution name.
-- [ ] Add a tag-checked Trusted Publishing workflow.
+- [x] Add a tag-checked Trusted Publishing workflow.
 - [x] Verify release metadata in a built wheel.
 - [ ] Configure the maintainer-controlled GitHub environment and pending PyPI
   publisher.
@@ -31,6 +31,19 @@ Licensing and naming checkpoint:
   `Root-Is-Purelib: false`.
 - Installed that wheel into a clean environment and passed
   `tools/installed_wheel_smoke.py` without Java or build-path overrides.
+
+Release automation checkpoint:
+
+- Made the five-platform wheel workflow reusable by the release workflow.
+- Added a dependency-free release validator that requires an exact
+  `v<project-version>` tag, exactly one wheel for every supported platform,
+  matching wheel metadata/tags, and the required legal files.
+- Added a stable-release-only workflow that builds the wheels, validates them
+  without OIDC authority, then gates a two-step Trusted Publishing job on the
+  protected `pypi` environment.
+- `PYTHONPATH=src ./venv/bin/python -m unittest discover -v` — 61 tests passed,
+  including four release-validation tests; five native-only tests skipped in
+  this source-path run. Both workflow files also parse as YAML.
 
 ## Completed milestones
 
