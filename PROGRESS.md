@@ -48,6 +48,17 @@ Cross-platform CI checkpoint:
   probe. `./gradlew --offline :java:test` and the macOS ARM64 native C smoke
   test both pass with the updated metadata. A follow-up matrix run is required
   before the milestone is complete.
+- Follow-up run `29411158015` exposed a Windows launcher issue after its JVM
+  tests: Gradle attempted to start the extensionless POSIX Native Image
+  command. The native build now selects `native-image.cmd` and invokes it via
+  `cmd /c` on Windows while retaining direct execution on POSIX.
+- The same run completed both macOS wheels and installed-wheel smoke tests.
+  Linux advanced past the class lookup, then exposed the paired
+  `GraphicsEnvironment.isHeadless()` JNI method lookup used by OpenJDK's AWT
+  loader; that static method is now registered too.
+- The POSIX launcher refactor and complete AWT registration pass a forced
+  macOS ARM64 native rebuild and C smoke test. Another matrix run is needed to
+  verify the Windows and Linux corrections.
 
 Documentation checkpoint:
 

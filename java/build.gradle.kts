@@ -40,14 +40,15 @@ tasks.test {
     }
 }
 
+val isMacOs = System.getProperty("os.name").startsWith("Mac")
+val isWindows = System.getProperty("os.name").startsWith("Windows")
+val nativeImageExecutable = if (isWindows) "native-image.cmd" else "native-image"
 val graalVmHome = providers.gradleProperty("graalVmHome")
     .orElse(providers.environmentVariable("GRAALVM_HOME"))
 val nativeImageCommand = graalVmHome
-    .map { file("$it/bin/native-image").absolutePath }
-    .orElse("native-image")
+    .map { file("$it/bin/$nativeImageExecutable").absolutePath }
+    .orElse(nativeImageExecutable)
 val nativeOutputDirectory = layout.buildDirectory.dir("native")
-val isMacOs = System.getProperty("os.name").startsWith("Mac")
-val isWindows = System.getProperty("os.name").startsWith("Windows")
 val nativeLibraryBaseName = if (isWindows) "py_pdftools" else "libpy_pdftools"
 val defaultMacOsDeploymentTarget = if (System.getProperty("os.arch") == "aarch64") {
     "11.0"
@@ -78,7 +79,6 @@ tasks.register<Exec>("nativeCompile") {
             environment("MACOSX_DEPLOYMENT_TARGET", macOsDeploymentTarget.get())
         }
         val arguments = mutableListOf(
-            nativeImageCommand.get(),
             "--shared",
             "-O1",
             "-Djava.awt.headless=true",
@@ -96,7 +96,11 @@ tasks.register<Exec>("nativeCompile") {
             "-cp",
             (runtimeClasspath.get() + files(tasks.jar)).asPath,
         ))
-        commandLine(arguments)
+        if (isWindows) {
+            commandLine(listOf("cmd", "/d", "/c", nativeImageCommand.get()) + arguments)
+        } else {
+            commandLine(listOf(nativeImageCommand.get()) + arguments)
+        }
     }
 }
 

@@ -13,7 +13,13 @@
         "typeReached": "org.apache.pdfbox.filter.FilterFactory"
       },
       "type": "java.awt.GraphicsEnvironment",
-      "jniAccessible": true
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "isHeadless",
+          "parameterTypes": []
+        }
+      ]
     },
     {
       "condition": {
