@@ -1,15 +1,11 @@
-"""High-level Python operations.
-
-The native call boundary is introduced in milestone M2. Keeping the public
-entry points here now lets callers and type checkers rely on the documented
-surface while producing an explicit error if an operation is attempted before
-the native backend is available.
-"""
+"""High-level Python operations."""
 
 from __future__ import annotations
 
-from ._exceptions import InvalidPdfError, NativeLibraryError
+from . import _runtime
+from ._exceptions import InvalidPdfError
 from ._models import OcrDocument, OcrTextLayerOptions, PdfInfo
+from ._protocol import deserialize_pdf_info, serialize_ocr_request
 
 
 def _validated_pdf_bytes(pdf: bytes | bytearray | memoryview) -> bytes:
@@ -22,12 +18,6 @@ def _validated_pdf_bytes(pdf: bytes | bytearray | memoryview) -> bytes:
     return value
 
 
-def _native_backend_unavailable() -> NativeLibraryError:
-    return NativeLibraryError(
-        "the native py-pdftools backend has not been installed or initialized"
-    )
-
-
 def add_ocr_text_layer(
     pdf: bytes | bytearray | memoryview,
     ocr: OcrDocument,
@@ -36,17 +26,20 @@ def add_ocr_text_layer(
 ) -> bytes:
     """Return a copy of a PDF with an invisible OCR text layer added."""
 
-    _validated_pdf_bytes(pdf)
+    pdf_bytes = _validated_pdf_bytes(pdf)
     if not isinstance(ocr, OcrDocument):
         raise TypeError("ocr must be an OcrDocument")
     if options is not None and not isinstance(options, OcrTextLayerOptions):
         raise TypeError("options must be an OcrTextLayerOptions or None")
 
-    raise _native_backend_unavailable()
+    effective_options = options or OcrTextLayerOptions()
+    request = serialize_ocr_request(ocr, effective_options)
+    return _runtime.add_ocr_text_layer(pdf_bytes, request)
 
 
 def inspect_pdf(pdf: bytes | bytearray | memoryview) -> PdfInfo:
     """Return basic page and geometry information about a PDF."""
 
-    _validated_pdf_bytes(pdf)
-    raise _native_backend_unavailable()
+    pdf_bytes = _validated_pdf_bytes(pdf)
+    response = _runtime.inspect_pdf(pdf_bytes)
+    return deserialize_pdf_info(response)

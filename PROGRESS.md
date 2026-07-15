@@ -6,26 +6,35 @@ This file records implementation milestones, verification results, and decisions
 
 ### M2 — Native protocol boundary
 
-Status: in progress
+Status: complete
 
 - [x] Define native ABI, request-schema, and inspection-schema version 1.
 - [x] Serialize complete OCR requests as deterministic, dependency-free UTF-8 JSON.
 - [x] Validate and deserialize native PDF inspection responses.
 - [x] Define stable native status values and public exception mapping.
-- [ ] Discover and bind the platform-specific native library.
-- [ ] Lazily initialize one native runtime and verify its ABI version.
-- [ ] Serialize native calls across Python threads and release runtime resources.
-- [ ] Connect the public operations to the native adapter and test with fakes.
+- [x] Discover and bind the platform-specific native library.
+- [x] Lazily initialize one native runtime and verify its ABI version.
+- [x] Serialize native calls across Python threads and release runtime resources.
+- [x] Connect the public operations to the native adapter and test with fakes.
 
 The JSON protocol is private and shipped in lockstep with the native library.
 It was chosen over CBOR for the first release to keep the Python core
 dependency-free and avoid adding a binary codec to both language layers.
 
-Protocol checkpoint verification:
+Verification:
 
-- `PYTHONPATH=src python3 -m unittest discover -v` — 36 tests passed on Python 3.14.6.
+- `PYTHONPATH=src python3 -m unittest discover -v` — 51 tests passed on Python 3.14.6.
 - `python3 -m compileall -q src tests` — passed.
 - `git diff --check` — passed.
+
+The low-level adapter is tested against a fake C library, including buffer
+copy/free behavior, native error retrieval, status mapping, and GraalVM thread
+attach/detach behavior. Runtime tests cover lazy reuse, ABI mismatch, shutdown,
+and serialized access from eight Python threads.
+
+No native library is bundled yet. Public calls now reach the complete Python
+boundary and then report `NativeLibraryError` until M4 supplies the GraalVM
+artifact.
 
 ## Completed milestones
 
@@ -45,9 +54,8 @@ Verification:
 - `python3 -m compileall -q src tests` — passed.
 - `git diff --check` — passed.
 
-The public operations currently validate their Python arguments and raise a
-clear `NativeLibraryError`; actual native dispatch is deliberately deferred to
-M2 rather than represented as operational.
+At the M1 checkpoint, public operations stopped after validation; M2 replaced
+that temporary seam with native serialization and dispatch.
 
 ## Planned milestones
 
@@ -76,3 +84,4 @@ M2 rather than represented as operational.
 - 2026-07-15: Read the complete specification and selected the Python public contract as the first milestone.
 - 2026-07-15: Completed M1 with package metadata, public models, validation, exceptions, API exports, typing marker, and tests.
 - 2026-07-15: Defined the M2 versioned JSON protocol and native status mapping; protocol tests also caught and fixed float drift in normalized rectangles.
+- 2026-07-15: Completed M2 with native library discovery, ctypes bindings, lazy ABI-checked lifecycle management, thread serialization, public dispatch, and 51 passing tests.
