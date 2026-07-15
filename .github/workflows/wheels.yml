@@ -33,7 +33,6 @@ jobs:
           java-version: "25"
           distribution: graalvm-community
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          cache: gradle
       - name: Install Python build tools
         run: $PYTHON -m pip install "hatchling>=1.31,<2" build
       - name: Run JVM tests
@@ -56,7 +55,7 @@ jobs:
         run: |
           unset PYTHONPATH PY_PDFTOOLS_NATIVE_LIBRARY GRAALVM_HOME JAVA_HOME
           PATH=/usr/bin:/bin wheel-venv/bin/python tools/installed_wheel_smoke.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel-${{ matrix.platform-tag }}
           path: dist/*.whl
@@ -107,7 +106,7 @@ jobs:
         run: |
           unset PYTHONPATH PY_PDFTOOLS_NATIVE_LIBRARY GRAALVM_HOME JAVA_HOME
           PATH=/usr/bin:/bin wheel-venv/bin/python tools/installed_wheel_smoke.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel-${{ matrix.platform-tag }}
           path: dist/*.whl
@@ -158,7 +157,7 @@ jobs:
           Remove-Item Env:JAVA_HOME -ErrorAction SilentlyContinue
           $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
           & $python tools/installed_wheel_smoke.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel-win_amd64
           path: dist/*.whl

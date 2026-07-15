@@ -6,7 +6,7 @@ This file records implementation milestones, verification results, and decisions
 
 ### M6 — Distribution
 
-Status: in progress
+Status: complete
 
 - [x] Stage the native library and its runtime dependencies into the Python
   package.
@@ -63,6 +63,14 @@ Cross-platform CI checkpoint:
   including native/Python tests and the installed-wheel smoke test. Linux
   advanced through AWT headless detection and exposed OpenJDK's final loader
   call, `System.load(String)`, which is now also registered for JNI access.
+- GitHub Actions run `29412126420` passed all five supported wheel jobs:
+  manylinux 2.28 x86-64/ARM64, macOS 11 ARM64, macOS 10.15 x86-64, and Windows
+  x86-64. Every job built a wheel, exercised the real native/Python path,
+  installed the wheel, ran without build tools, and uploaded its artifact.
+- Updated artifact uploads from `actions/upload-artifact@v4` to current v7 to
+  avoid the retired Node 20 action runtime. Disabled the ineffective Gradle
+  cache integration inside manylinux job containers, where it emitted an
+  empty-path warning and saved no cache.
 
 Documentation checkpoint:
 
