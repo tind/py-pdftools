@@ -8,12 +8,27 @@ This file records implementation milestones, verification results, and decisions
 
 Status: in progress
 
-- [ ] Stage the native library and its runtime dependencies into the Python
+- [x] Stage the native library and its runtime dependencies into the Python
   package.
-- [ ] Build and inspect a platform-specific wheel.
-- [ ] Test an installed wheel without Java or repository-path overrides.
+- [x] Build and inspect a platform-specific wheel.
+- [x] Test an installed wheel without Java or repository-path overrides.
 - [ ] Add supported-platform CI build and test jobs.
 - [ ] Complete public usage, build, and release documentation.
+
+macOS ARM64 wheel checkpoint:
+
+- Added a Hatch build hook that invokes `:java:nativeCompile`, stages every
+  runtime shared library, marks the wheel as platform-specific, and uses a
+  Python-ABI-independent `py3-none-<platform>` tag.
+- The macOS build targets 11.0 for ARM64 (10.15 for x86-64). Native Image's
+  generated `libjava` and `libjvm` forwarding shims are safely normalized to
+  the same deployment target in the staged copy and ad-hoc re-signed.
+- Built `py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl`. Inspection shows
+  `Root-Is-Purelib: false`, all ten required dylibs, valid signatures, and an
+  11.0 minimum on every bundled binary.
+- Installed the wheel into a clean `/tmp` venv and ran
+  `tools/installed_wheel_smoke.py` with Java/GraalVM and all development
+  overrides removed from the environment — passed.
 
 ## Completed milestones
 

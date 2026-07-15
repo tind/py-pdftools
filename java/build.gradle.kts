@@ -46,6 +46,15 @@ val nativeImageCommand = graalVmHome
     .map { file("$it/bin/native-image").absolutePath }
     .orElse("native-image")
 val nativeOutputDirectory = layout.buildDirectory.dir("native")
+val isMacOs = System.getProperty("os.name").startsWith("Mac")
+val defaultMacOsDeploymentTarget = if (System.getProperty("os.arch") == "aarch64") {
+    "11.0"
+} else {
+    "10.15"
+}
+val macOsDeploymentTarget = providers.gradleProperty("macOsDeploymentTarget")
+    .orElse(providers.environmentVariable("MACOSX_DEPLOYMENT_TARGET"))
+    .orElse(defaultMacOsDeploymentTarget)
 
 tasks.register<Exec>("nativeCompile") {
     group = "build"
@@ -54,23 +63,38 @@ tasks.register<Exec>("nativeCompile") {
 
     val runtimeClasspath = configurations.runtimeClasspath
     inputs.files(tasks.jar, runtimeClasspath)
+    if (isMacOs) {
+        inputs.property("macOsDeploymentTarget", macOsDeploymentTarget)
+    }
     outputs.dir(nativeOutputDirectory)
 
     doFirst {
         val outputDirectory = nativeOutputDirectory.get().asFile
         outputDirectory.mkdirs()
         workingDir(outputDirectory)
-        commandLine(
+        if (isMacOs) {
+            environment("MACOSX_DEPLOYMENT_TARGET", macOsDeploymentTarget.get())
+        }
+        val arguments = mutableListOf(
             nativeImageCommand.get(),
             "--shared",
             "-O1",
             "-Djava.awt.headless=true",
             "-H:+AddAllCharsets",
+        )
+        if (isMacOs) {
+            arguments.add(
+                "-H:NativeLinkerOption=-mmacosx-version-min=" +
+                    macOsDeploymentTarget.get(),
+            )
+        }
+        arguments.addAll(listOf(
             "-o",
             "libpy_pdftools",
             "-cp",
             (runtimeClasspath.get() + files(tasks.jar)).asPath,
-        )
+        ))
+        commandLine(arguments)
     }
 }
 
