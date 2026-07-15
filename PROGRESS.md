@@ -4,6 +4,31 @@ This file records implementation milestones, verification results, and decisions
 
 ## Current milestone
 
+### M2 — Native protocol boundary
+
+Status: in progress
+
+- [x] Define native ABI, request-schema, and inspection-schema version 1.
+- [x] Serialize complete OCR requests as deterministic, dependency-free UTF-8 JSON.
+- [x] Validate and deserialize native PDF inspection responses.
+- [x] Define stable native status values and public exception mapping.
+- [ ] Discover and bind the platform-specific native library.
+- [ ] Lazily initialize one native runtime and verify its ABI version.
+- [ ] Serialize native calls across Python threads and release runtime resources.
+- [ ] Connect the public operations to the native adapter and test with fakes.
+
+The JSON protocol is private and shipped in lockstep with the native library.
+It was chosen over CBOR for the first release to keep the Python core
+dependency-free and avoid adding a binary codec to both language layers.
+
+Protocol checkpoint verification:
+
+- `PYTHONPATH=src python3 -m unittest discover -v` — 36 tests passed on Python 3.14.6.
+- `python3 -m compileall -q src tests` — passed.
+- `git diff --check` — passed.
+
+## Completed milestones
+
 ### M1 — Python public contract
 
 Status: complete
@@ -50,3 +75,4 @@ M2 rather than represented as operational.
 
 - 2026-07-15: Read the complete specification and selected the Python public contract as the first milestone.
 - 2026-07-15: Completed M1 with package metadata, public models, validation, exceptions, API exports, typing marker, and tests.
+- 2026-07-15: Defined the M2 versioned JSON protocol and native status mapping; protocol tests also caught and fixed float drift in normalized rectangles.

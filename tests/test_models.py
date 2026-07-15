@@ -37,6 +37,12 @@ class NormalizedRectTests(unittest.TestCase):
         self.assertEqual(rect, NormalizedRect(0.0, 0.0, 1.0, 1.0))
         self.assertIsInstance(rect.left, float)
 
+    def test_preserves_in_range_float_dimensions_without_recalculation(self) -> None:
+        rect = NormalizedRect(left=0.1, top=0.2, width=0.3, height=0.04)
+
+        self.assertEqual(rect.width, 0.3)
+        self.assertEqual(rect.height, 0.04)
+
     def test_clamps_values_within_numeric_tolerance(self) -> None:
         rect = NormalizedRect(-0.0000005, 0.1, 1.000001, 0.2)
 

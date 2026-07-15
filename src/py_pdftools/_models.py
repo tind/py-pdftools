@@ -80,12 +80,18 @@ class NormalizedRect:
         if right > 1.0 + tolerance or bottom > 1.0 + tolerance:
             raise InvalidOcrDataError("rectangle ends outside the normalized page")
 
-        clamped_left = min(1.0, max(0.0, left))
-        clamped_top = min(1.0, max(0.0, top))
-        clamped_right = min(1.0, max(0.0, right))
-        clamped_bottom = min(1.0, max(0.0, bottom))
-        clamped_width = clamped_right - clamped_left
-        clamped_height = clamped_bottom - clamped_top
+        if left >= 0.0 and top >= 0.0 and right <= 1.0 and bottom <= 1.0:
+            clamped_left = left
+            clamped_top = top
+            clamped_width = width
+            clamped_height = height
+        else:
+            clamped_left = min(1.0, max(0.0, left))
+            clamped_top = min(1.0, max(0.0, top))
+            clamped_right = min(1.0, max(0.0, right))
+            clamped_bottom = min(1.0, max(0.0, bottom))
+            clamped_width = clamped_right - clamped_left
+            clamped_height = clamped_bottom - clamped_top
         if clamped_width <= 0.0 or clamped_height <= 0.0:
             raise InvalidOcrDataError("rectangle must overlap the normalized page")
 
