@@ -47,6 +47,14 @@ Release automation checkpoint:
   not import the new release test because `tomllib` was added in Python 3.11.
   The validator now uses the `tomli` compatibility package on Python 3.10,
   declared only for tests/build tooling; runtime dependencies remain empty.
+- Follow-up run `29415240601` passed the complete pipeline on all five targets:
+  native tests, the Python 3.10 suite including release checks, clean wheel
+  installation, installed-wheel smoke, and artifact upload.
+- Downloaded and merged the five wheels from that run, then ran
+  `tools/check_release_artifacts.py --tag v0.1.0`; it validated the exact
+  distribution names, platform set, metadata, tags, and legal files.
+- GitHub registers both `Platform wheels` and `Publish release to PyPI` as
+  active workflows. The publish workflow did not run on ordinary pushes.
 - `PYTHONPATH=src ./venv/bin/python -m unittest discover -v` — 61 tests passed,
   including four release-validation tests; five native-only tests skipped in
   this source-path run. Both workflow files also parse as YAML.
