@@ -5,10 +5,14 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import tomllib
 import zipfile
 from email.parser import BytesParser
 from pathlib import Path
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - exercised by Python 3.10 CI
+    import tomli as tomllib
 
 WHEEL_TAGS = (
     "py3-none-macosx_10_15_x86_64",

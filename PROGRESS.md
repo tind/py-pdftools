@@ -42,6 +42,11 @@ Release automation checkpoint:
 - Added a stable-release-only workflow that builds the wheels, validates them
   without OIDC authority, then gates a two-step Trusted Publishing job on the
   protected `pypi` environment.
+- Initial post-push run `29414781349` built the renamed wheel on all five
+  targets and passed every existing native/Python test, but Python 3.10 could
+  not import the new release test because `tomllib` was added in Python 3.11.
+  The validator now uses the `tomli` compatibility package on Python 3.10,
+  declared only for tests/build tooling; runtime dependencies remain empty.
 - `PYTHONPATH=src ./venv/bin/python -m unittest discover -v` — 61 tests passed,
   including four release-validation tests; five native-only tests skipped in
   this source-path run. Both workflow files also parse as YAML.
