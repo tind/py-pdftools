@@ -12,6 +12,13 @@
       "condition": {
         "typeReached": "org.apache.pdfbox.filter.FilterFactory"
       },
+      "type": "java.awt.GraphicsEnvironment",
+      "jniAccessible": true
+    },
+    {
+      "condition": {
+        "typeReached": "org.apache.pdfbox.filter.FilterFactory"
+      },
       "type": "java.awt.image.BufferedImage",
       "jniAccessible": true,
       "fields": [

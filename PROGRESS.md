@@ -39,8 +39,15 @@ Cross-platform CI checkpoint:
   smoke test without build-tool environment variables.
 - Linux jobs build inside the matching PyPA manylinux containers, and all jobs
   upload their platform wheel for later release assembly.
-- The workflow YAML parses locally. Cross-platform execution remains to be
-  verified after the repository is available to GitHub Actions.
+- Initial GitHub Actions run `29410678210` proved the macOS ARM64 wheel and its
+  installed-wheel smoke test, while macOS Intel passed native tests. Both
+  Linux architectures built wheels but exposed the same missing
+  `java.awt.GraphicsEnvironment` JNI reachability registration during the
+  native smoke test.
+- Added the Linux-specific AWT JNI registration and extended the JVM metadata
+  probe. `./gradlew --offline :java:test` and the macOS ARM64 native C smoke
+  test both pass with the updated metadata. A follow-up matrix run is required
+  before the milestone is complete.
 
 Documentation checkpoint:
 
