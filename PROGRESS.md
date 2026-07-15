@@ -2,19 +2,19 @@
 
 This file records implementation milestones, verification results, and decisions that affect later work.
 
-## Current milestone
+## Latest milestone
 
 ### M8 — PyPI description correction
 
-Status: in progress
+Status: complete
 
 - [x] Replace transitional pre-release wording with durable installation text.
 - [x] Correct the distribution name in the specification's wheel examples.
 - [x] Reject transitional release wording in packaged wheel metadata.
 - [x] Set the patch version to 0.1.1.
-- [ ] Pass the complete five-platform wheel matrix for the release commit.
-- [ ] Publish `v0.1.1` through the protected Trusted Publishing workflow.
-- [ ] Verify the corrected public metadata and a fresh PyPI installation.
+- [x] Pass the complete five-platform wheel matrix for the release commit.
+- [x] Publish `v0.1.1` through the protected Trusted Publishing workflow.
+- [x] Verify the corrected public metadata and a fresh PyPI installation.
 
 This is a metadata-only patch release. The Python, Java, and native runtime
 sources are unchanged from 0.1.0. Version 0.1.0 remains functional and
@@ -32,6 +32,29 @@ Release preparation checkpoint:
 - Installed the local 0.1.1 wheel into a clean environment and passed
   `tools/installed_wheel_smoke.py` with Java, GraalVM, source paths, and native
   library overrides removed.
+
+Public patch-release checkpoint:
+
+- Pre-tag workflow run
+  [`29419203961`](https://github.com/tind/py-pdftools/actions/runs/29419203961)
+  passed the complete five-platform matrix at commit `0ce602a`.
+- Published GitHub release
+  [`v0.1.1`](https://github.com/tind/py-pdftools/releases/tag/v0.1.1) from an
+  annotated tag on that exact green commit. No duplicate tag-push matrix ran.
+- Release workflow run
+  [`29419828882`](https://github.com/tind/py-pdftools/actions/runs/29419828882)
+  built all five wheels, rejected stale-description metadata during exact
+  artifact validation, passed protected-environment review, and published via
+  PyPI Trusted Publishing.
+- PyPI now reports 0.1.1 as the latest version and renders the durable
+  self-contained-wheel installation description. The public release contains
+  exactly the five expected non-yanked wheels, with Apache-2.0 metadata and
+  `Requires-Python: >=3.10`; the five functional 0.1.0 wheels remain available
+  and non-yanked.
+- After the Simple Index finished propagating, a fresh macOS ARM64 environment
+  installed `tindtechnologies-py-pdftools==0.1.1` from public PyPI and selected
+  the expected `py3-none-macosx_11_0_arm64` wheel. The installed-wheel smoke
+  test passed without Java, GraalVM, source paths, or native overrides.
 
 ## Completed milestones
 
@@ -138,10 +161,10 @@ Post-publication metadata follow-up:
   immutable release retains its pre-publication status paragraph. PyPI stores
   metadata from the first file uploaded for a version, so the description
   cannot be corrected in place.
-- Main now uses durable, version-independent installation wording, and the
-  release checklist requires that wording before tagging. Publishing a 0.1.1
-  patch would make the corrected description current on PyPI; otherwise the
-  next functional release will do so.
+- Version 0.1.1 resolved the public description while retaining 0.1.0 as a
+  functional, non-yanked release. Main uses durable, version-independent
+  installation wording, and release validation now rejects the transitional
+  phrases before publication.
 
 ### M6 — Distribution
 
@@ -441,3 +464,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Published `v0.1.0` through the protected Trusted Publishing workflow and verified the exact five-file release on public PyPI.
 - 2026-07-15: Completed M7 and the version 0.1 specification after a fresh public-index installation passed the installed-wheel smoke test without build tools.
 - 2026-07-15: Started M8 to publish durable README metadata as version 0.1.1; runtime sources remain identical to 0.1.0.
+- 2026-07-15: Completed M8 by publishing and verifying `v0.1.1`; PyPI now presents the durable description, and a fresh public installation passed without build tools.
