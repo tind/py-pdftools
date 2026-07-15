@@ -10,7 +10,9 @@ fits and embeds Unicode text, and returns a new PDF as bytes.
 
 The project is pre-release. The implementation works end to end and all five
 supported platform wheels pass CI, but no package has been published to PyPI
-yet. See [`PROGRESS.md`](PROGRESS.md) for the current release status.
+yet. See
+[`PROGRESS.md`](https://github.com/tind/py-pdftools/blob/main/PROGRESS.md) for
+the current release status.
 
 ## Installation
 
@@ -30,7 +32,8 @@ import remains `py_pdftools`.
   x86-64.
 - No Java, JVM, Gradle, Maven, or GraalVM installation.
 
-Until wheels are published, build one from source using [`BUILDING.md`](BUILDING.md).
+Until wheels are published, build one from source using
+[`BUILDING.md`](https://github.com/tind/py-pdftools/blob/main/BUILDING.md).
 
 ## Add an OCR text layer
 
@@ -130,15 +133,18 @@ permissions, native loading, and PDF processing failures.
 
 Project code is licensed under the Apache License 2.0. The bundled Noto Sans
 font is licensed separately under the SIL Open Font License 1.1. See
-[`LICENSE`](LICENSE), [`NOTICE`](NOTICE), and the bundled third-party license
-texts for details.
+[`LICENSE`](https://github.com/tind/py-pdftools/blob/main/LICENSE),
+[`NOTICE`](https://github.com/tind/py-pdftools/blob/main/NOTICE), and the
+bundled third-party license texts for details.
 
 ## Project documentation
 
-- [`SPECS.md`](SPECS.md) — version 0.1 behavior and acceptance contract.
-- [`BUILDING.md`](BUILDING.md) — local builds, tests, and platform wheels.
-- [`docs/textract-normalization.md`](docs/textract-normalization.md) — convert
+- [`SPECS.md`](https://github.com/tind/py-pdftools/blob/main/SPECS.md) — version
+  0.1 behavior and acceptance contract.
+- [`BUILDING.md`](https://github.com/tind/py-pdftools/blob/main/BUILDING.md) —
+  local builds, tests, and platform wheels.
+- [`docs/textract-normalization.md`](https://github.com/tind/py-pdftools/blob/main/docs/textract-normalization.md) — convert
   Textract-shaped mappings without adding boto3 to the package.
-- [`docs/native-abi-v1.md`](docs/native-abi-v1.md) — private Python/native
+- [`docs/native-abi-v1.md`](https://github.com/tind/py-pdftools/blob/main/docs/native-abi-v1.md) — private Python/native
   protocol.
-- [`docs/releasing.md`](docs/releasing.md) — wheel and publication checklist.
+- [`docs/releasing.md`](https://github.com/tind/py-pdftools/blob/main/docs/releasing.md) — wheel and publication checklist.

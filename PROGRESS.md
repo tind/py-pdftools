@@ -12,6 +12,7 @@ Status: in progress
 - [x] Select the public PyPI distribution name.
 - [x] Add a tag-checked Trusted Publishing workflow.
 - [x] Verify release metadata in a built wheel.
+- [x] Document and hand off the one-time release configuration.
 - [ ] Configure the maintainer-controlled GitHub environment and pending PyPI
   publisher.
 - [ ] Publish and verify the first public release.
@@ -44,6 +45,16 @@ Release automation checkpoint:
 - `PYTHONPATH=src ./venv/bin/python -m unittest discover -v` — 61 tests passed,
   including four release-validation tests; five native-only tests skipped in
   this source-path run. Both workflow files also parse as YAML.
+
+Release hand-off checkpoint:
+
+- Confirmed the public repository identity is `tind/py-pdftools` and that no
+  GitHub environment is configured yet.
+- Confirmed `tindtechnologies-py-pdftools` is not currently present on PyPI;
+  the name remains unreserved until the first pending-publisher upload.
+- Documented the exact GitHub `pypi` environment and PyPI pending-publisher
+  fields, stable tag/release flow, post-publication checks, and immutable-file
+  recovery rule.
 
 ## Completed milestones
 
@@ -341,3 +352,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Completed M5 by connecting OCR to the native ABI, bundling the required Native Image resources, expanding the C smoke test, and passing the real Python transformation path.
 - 2026-07-15: Added a verified self-contained macOS ARM64 wheel build, installed-wheel smoke test, five-platform wheel CI matrix, and public build/usage/release documentation.
 - 2026-07-15: Started M7 with Apache-2.0 project licensing, complete bundled notices, and the `tindtechnologies-py-pdftools` distribution name.
+- 2026-07-15: Added the tag-checked reusable wheel release workflow, least-privilege PyPI Trusted Publishing job, and exact maintainer setup guide.
