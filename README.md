@@ -8,9 +8,20 @@ without requiring Java at runtime. It accepts provider-independent OCR lines,
 maps normalized visible-page coordinates through crop boxes and page rotation,
 fits and embeds Unicode text, and returns a new PDF as bytes.
 
-The project is pre-release. The implementation works end to end and a local
-macOS ARM64 wheel has been verified, but no package has been published to PyPI
+The project is pre-release. The implementation works end to end and all five
+supported platform wheels pass CI, but no package has been published to PyPI
 yet. See [`PROGRESS.md`](PROGRESS.md) for the current release status.
+
+## Installation
+
+Once the first release is published:
+
+```bash
+python -m pip install tindtechnologies-py-pdftools
+```
+
+The PyPI distribution is named `tindtechnologies-py-pdftools`; the Python
+import remains `py_pdftools`.
 
 ## Runtime requirements
 
@@ -114,6 +125,13 @@ coordinates themselves remain in PDF user space.
 All public failures derive from `PdfToolsError`. More specific exceptions
 distinguish invalid PDFs, invalid OCR data, page mismatches, font coverage,
 permissions, native loading, and PDF processing failures.
+
+## License
+
+Project code is licensed under the Apache License 2.0. The bundled Noto Sans
+font is licensed separately under the SIL Open Font License 1.1. See
+[`LICENSE`](LICENSE), [`NOTICE`](NOTICE), and the bundled third-party license
+texts for details.
 
 ## Project documentation
 

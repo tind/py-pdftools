@@ -3,11 +3,18 @@ requires = ["hatchling>=1.31,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "py-pdftools"
+name = "tindtechnologies-py-pdftools"
 version = "0.1.0"
 description = "High-level PDF transformations backed by Apache PDFBox"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = [
+  "LICENSE",
+  "NOTICE",
+  "LICENSES/*",
+  "java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt",
+]
 authors = [
   { name = "py-pdftools contributors" },
 ]
@@ -24,6 +31,11 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/tind/py-pdftools"
+Repository = "https://github.com/tind/py-pdftools"
+Issues = "https://github.com/tind/py-pdftools/issues"
 
 [project.optional-dependencies]
 test = [

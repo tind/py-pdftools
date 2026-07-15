@@ -4,6 +4,36 @@ This file records implementation milestones, verification results, and decisions
 
 ## Current milestone
 
+### M7 — Public release
+
+Status: in progress
+
+- [x] Select the project and distribution licenses.
+- [x] Select the public PyPI distribution name.
+- [ ] Add a tag-checked Trusted Publishing workflow.
+- [x] Verify release metadata in a built wheel.
+- [ ] Configure the maintainer-controlled GitHub environment and pending PyPI
+  publisher.
+- [ ] Publish and verify the first public release.
+
+Licensing and naming checkpoint:
+
+- Project code uses the Apache License 2.0, matching Apache PDFBox.
+- The distribution archive records Apache-2.0 metadata and includes the
+  project license, third-party notices, Apache PDFBox's complete bundled
+  license text, and the SIL Open Font License for the embedded Noto font.
+- The public distribution is `tindtechnologies-py-pdftools`; the import
+  package remains `py_pdftools`.
+- Built
+  `tindtechnologies_py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl`.
+  Its metadata reports the requested name, Apache-2.0 expression, all four
+  legal files, a platform-specific `py3-none` tag, and
+  `Root-Is-Purelib: false`.
+- Installed that wheel into a clean environment and passed
+  `tools/installed_wheel_smoke.py` without Java or build-path overrides.
+
+## Completed milestones
+
 ### M6 — Distribution
 
 Status: complete
@@ -83,8 +113,6 @@ Documentation checkpoint:
 - Added a dependency-free Textract mapping example and a release checklist
   that separates local verification from maintainer-controlled GitHub/PyPI
   configuration.
-
-## Completed milestones
 
 ### M5 — OCR text transformation
 
@@ -271,6 +299,7 @@ that temporary seam with native serialization and dispatch.
 4. **M4 — Native inspection path:** GraalVM ABI implementation and Python `inspect_pdf` end to end.
 5. **M5 — OCR text transformation:** coordinate conversion, fitting, invisible text, fonts, and fixtures.
 6. **M6 — Distribution:** native builds, platform wheels, CI, documentation, and release checks.
+7. **M7 — Public release:** license metadata, trusted publishing, and first PyPI release.
 
 ## Environment baseline
 
@@ -298,3 +327,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Added the PDFBox OCR writer with fitted invisible text, a pinned embeddable font, confidence filtering, permission handling, and output-preservation tests.
 - 2026-07-15: Completed M5 by connecting OCR to the native ABI, bundling the required Native Image resources, expanding the C smoke test, and passing the real Python transformation path.
 - 2026-07-15: Added a verified self-contained macOS ARM64 wheel build, installed-wheel smoke test, five-platform wheel CI matrix, and public build/usage/release documentation.
+- 2026-07-15: Started M7 with Apache-2.0 project licensing, complete bundled notices, and the `tindtechnologies-py-pdftools` distribution name.

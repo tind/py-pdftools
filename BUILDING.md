@@ -92,7 +92,7 @@ For the local macOS ARM64 artifact:
 ```bash
 python3 -m venv /tmp/py-pdftools-wheel-venv
 /tmp/py-pdftools-wheel-venv/bin/python -m pip install --no-deps \
-  dist/py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl
+  dist/tindtechnologies_py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl
 
 env -u PYTHONPATH \
   -u PY_PDFTOOLS_NATIVE_LIBRARY \
