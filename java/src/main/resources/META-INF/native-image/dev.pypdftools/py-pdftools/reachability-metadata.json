@@ -25,6 +25,19 @@
       "condition": {
         "typeReached": "org.apache.pdfbox.filter.FilterFactory"
       },
+      "type": "java.lang.System",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "load",
+          "parameterTypes": ["java.lang.String"]
+        }
+      ]
+    },
+    {
+      "condition": {
+        "typeReached": "org.apache.pdfbox.filter.FilterFactory"
+      },
       "type": "java.awt.image.BufferedImage",
       "jniAccessible": true,
       "fields": [

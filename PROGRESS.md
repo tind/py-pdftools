@@ -59,6 +59,10 @@ Cross-platform CI checkpoint:
 - The POSIX launcher refactor and complete AWT registration pass a forced
   macOS ARM64 native rebuild and C smoke test. Another matrix run is needed to
   verify the Windows and Linux corrections.
+- Third run `29411644929` verified the complete Windows wheel pipeline,
+  including native/Python tests and the installed-wheel smoke test. Linux
+  advanced through AWT headless detection and exposed OpenJDK's final loader
+  call, `System.load(String)`, which is now also registered for JNI access.
 
 Documentation checkpoint:
 
