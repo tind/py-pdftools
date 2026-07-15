@@ -8,15 +8,14 @@ without requiring Java at runtime. It accepts provider-independent OCR lines,
 maps normalized visible-page coordinates through crop boxes and page rotation,
 fits and embeds Unicode text, and returns a new PDF as bytes.
 
-The project is pre-release. The implementation works end to end and all five
-supported platform wheels pass CI, but no package has been published to PyPI
-yet. See
+Self-contained wheels are available from
+[PyPI](https://pypi.org/project/tindtechnologies-py-pdftools/) for all five
+supported platforms. The complete implementation passes native, Python,
+installation, and installed-wheel smoke tests. See
 [`PROGRESS.md`](https://github.com/tind/py-pdftools/blob/main/PROGRESS.md) for
-the current release status.
+the release verification record.
 
 ## Installation
-
-Once the first release is published:
 
 ```bash
 python -m pip install tindtechnologies-py-pdftools
@@ -32,7 +31,7 @@ import remains `py_pdftools`.
   x86-64.
 - No Java, JVM, Gradle, Maven, or GraalVM installation.
 
-Until wheels are published, build one from source using
+To build a wheel from source, use
 [`BUILDING.md`](https://github.com/tind/py-pdftools/blob/main/BUILDING.md).
 
 ## Add an OCR text layer

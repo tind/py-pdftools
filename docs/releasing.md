@@ -1,8 +1,8 @@
 # Release checklist
 
-Version 0.1 is not published yet. Releases are wheel-only because every wheel
-contains a platform-specific native library; publishing a source archive would
-not provide an installable runtime package on its own.
+Version 0.1.0 was first published on 2026-07-15. Releases are wheel-only because
+every wheel contains a platform-specific native library; publishing a source
+archive would not provide an installable runtime package on its own.
 
 ## One-time maintainer setup
 
@@ -41,7 +41,8 @@ to the first release.
 3. Run Java tests, the C ABI smoke test, Python tests against the real native
    library, and the installed-wheel smoke test.
 4. Review dependency locks, bundled font source/checksum/license, and public
-   documentation.
+   documentation. Ensure the packaged README contains durable installation
+   wording rather than a pre-release status that will become stale on PyPI.
 5. Push the release commit and wait for the platform workflow to pass on all
    five supported targets:
 
@@ -86,8 +87,7 @@ For every wheel:
    metadata.
 2. Install `tindtechnologies-py-pdftools==<version>` from PyPI on at least one
    supported platform and run the installed-wheel smoke test.
-3. Update the pre-release wording in `README.md` and record the release URL,
-   workflow run, and verification in `PROGRESS.md`.
+3. Record the release URL, workflow run, and verification in `PROGRESS.md`.
 
 PyPI release files are immutable. Never delete and reuse a published version;
 if uploaded artifacts need to change, fix the issue and publish a new version.

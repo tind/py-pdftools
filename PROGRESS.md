@@ -2,11 +2,11 @@
 
 This file records implementation milestones, verification results, and decisions that affect later work.
 
-## Current milestone
+## Latest milestone
 
 ### M7 — Public release
 
-Status: in progress
+Status: complete
 
 - [x] Select the project and distribution licenses.
 - [x] Select the public PyPI distribution name.
@@ -15,7 +15,7 @@ Status: in progress
 - [x] Document and hand off the one-time release configuration.
 - [x] Configure the maintainer-controlled GitHub environment and pending PyPI
   publisher.
-- [ ] Publish and verify the first public release.
+- [x] Publish and verify the first public release.
 
 Licensing and naming checkpoint:
 
@@ -61,10 +61,10 @@ Release automation checkpoint:
 
 Release hand-off checkpoint:
 
-- Confirmed the public repository identity is `tind/py-pdftools` and that no
-  GitHub environment is configured yet.
-- Confirmed `tindtechnologies-py-pdftools` is not currently present on PyPI;
-  the name remains unreserved until the first pending-publisher upload.
+- Before maintainer setup, confirmed the public repository identity as
+  `tind/py-pdftools` and the absence of an existing GitHub environment.
+- Before publication, confirmed `tindtechnologies-py-pdftools` was unclaimed on
+  PyPI; the pending publisher claimed it during the first trusted upload.
 - Documented the exact GitHub `pypi` environment and PyPI pending-publisher
   fields, stable tag/release flow, post-publication checks, and immutable-file
   recovery rule.
@@ -75,6 +75,42 @@ Release hand-off checkpoint:
 - Limited direct `Platform wheels` push runs to branches. A published release
   still calls the reusable workflow at its tag, but pushing the tag itself no
   longer starts a duplicate five-platform build.
+
+Public release checkpoint:
+
+- Final pre-tag workflow run
+  [`29417273988`](https://github.com/tind/py-pdftools/actions/runs/29417273988)
+  passed the complete five-platform matrix at commit `43f8783`.
+- Published GitHub release
+  [`v0.1.0`](https://github.com/tind/py-pdftools/releases/tag/v0.1.0) from an
+  annotated tag on that commit. The tag push did not start a duplicate matrix.
+- Release workflow run
+  [`29417877615`](https://github.com/tind/py-pdftools/actions/runs/29417877615)
+  built all five wheels, validated the exact tag and artifact set, passed the
+  protected-environment review, and published with PyPI Trusted Publishing.
+- The public
+  [`tindtechnologies-py-pdftools 0.1.0`](https://pypi.org/project/tindtechnologies-py-pdftools/0.1.0/)
+  release lists exactly the expected macOS x86-64/ARM64, manylinux 2.28
+  x86-64/ARM64, and Windows x86-64 wheels. All are non-yanked; no source
+  archive or unexpected file was published.
+- Public metadata reports version `0.1.0`, `Requires-Python: >=3.10`, and the
+  Apache-2.0 license expression.
+- Installed `tindtechnologies-py-pdftools==0.1.0` from the public PyPI index in
+  a fresh temporary environment on macOS ARM64. The index selected the correct
+  `py3-none-macosx_11_0_arm64` wheel, and
+  `tools/installed_wheel_smoke.py` passed with Java, GraalVM, source paths, and
+  native-library overrides removed.
+
+Post-publication metadata follow-up:
+
+- The 0.1.0 files and runtime are correct, but the README embedded in that
+  immutable release retains its pre-publication status paragraph. PyPI stores
+  metadata from the first file uploaded for a version, so the description
+  cannot be corrected in place.
+- Main now uses durable, version-independent installation wording, and the
+  release checklist requires that wording before tagging. Publishing a 0.1.1
+  patch would make the corrected description current on PyPI; otherwise the
+  next functional release will do so.
 
 ## Completed milestones
 
@@ -335,7 +371,7 @@ Verification:
 At the M1 checkpoint, public operations stopped after validation; M2 replaced
 that temporary seam with native serialization and dispatch.
 
-## Planned milestones
+## Milestone plan
 
 1. **M1 — Python public contract:** models, validation, exceptions, packaging, and tests.
 2. **M2 — Native protocol boundary:** versioned serialization, FFI adapter contract, library discovery, and test doubles.
@@ -373,3 +409,5 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Added a verified self-contained macOS ARM64 wheel build, installed-wheel smoke test, five-platform wheel CI matrix, and public build/usage/release documentation.
 - 2026-07-15: Started M7 with Apache-2.0 project licensing, complete bundled notices, and the `tindtechnologies-py-pdftools` distribution name.
 - 2026-07-15: Added the tag-checked reusable wheel release workflow, least-privilege PyPI Trusted Publishing job, and exact maintainer setup guide.
+- 2026-07-15: Published `v0.1.0` through the protected Trusted Publishing workflow and verified the exact five-file release on public PyPI.
+- 2026-07-15: Completed M7 and the version 0.1 specification after a fresh public-index installation passed the installed-wheel smoke test without build tools.

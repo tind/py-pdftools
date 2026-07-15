@@ -1,8 +1,8 @@
 # `py-pdftools` Specification
 
-**Status:** Proposed
+**Status:** Implemented
 **Target version:** 0.1.0
-**Python distribution name:** `py-pdftools`
+**Python distribution name:** `tindtechnologies-py-pdftools`
 **Python import package:** `py_pdftools`
 **Native implementation:** Java, Apache PDFBox, GraalVM Native Image
 **Primary use case:** Add an invisible, searchable OCR text layer to an existing PDF.
