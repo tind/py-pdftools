@@ -12,7 +12,7 @@ Status: in progress
   package.
 - [x] Build and inspect a platform-specific wheel.
 - [x] Test an installed wheel without Java or repository-path overrides.
-- [ ] Add supported-platform CI build and test jobs.
+- [x] Add supported-platform CI build and test jobs.
 - [ ] Complete public usage, build, and release documentation.
 
 macOS ARM64 wheel checkpoint:
@@ -29,6 +29,18 @@ macOS ARM64 wheel checkpoint:
 - Installed the wheel into a clean `/tmp` venv and ran
   `tools/installed_wheel_smoke.py` with Java/GraalVM and all development
   overrides removed from the environment — passed.
+
+Cross-platform CI checkpoint:
+
+- Added a wheel workflow for manylinux 2.28 x86-64/ARM64, macOS 11 ARM64,
+  macOS 10.15 x86-64, and Windows x86-64.
+- Each job runs JVM tests, builds Native Image and the wheel, exercises the
+  real Python/native path, installs the wheel, and runs the installed-wheel
+  smoke test without build-tool environment variables.
+- Linux jobs build inside the matching PyPA manylinux containers, and all jobs
+  upload their platform wheel for later release assembly.
+- The workflow YAML parses locally. Cross-platform execution remains to be
+  verified after the repository is available to GitHub Actions.
 
 ## Completed milestones
 

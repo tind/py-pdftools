@@ -47,6 +47,8 @@ val nativeImageCommand = graalVmHome
     .orElse("native-image")
 val nativeOutputDirectory = layout.buildDirectory.dir("native")
 val isMacOs = System.getProperty("os.name").startsWith("Mac")
+val isWindows = System.getProperty("os.name").startsWith("Windows")
+val nativeLibraryBaseName = if (isWindows) "py_pdftools" else "libpy_pdftools"
 val defaultMacOsDeploymentTarget = if (System.getProperty("os.arch") == "aarch64") {
     "11.0"
 } else {
@@ -90,7 +92,7 @@ tasks.register<Exec>("nativeCompile") {
         }
         arguments.addAll(listOf(
             "-o",
-            "libpy_pdftools",
+            nativeLibraryBaseName,
             "-cp",
             (runtimeClasspath.get() + files(tasks.jar)).asPath,
         ))
@@ -112,6 +114,7 @@ tasks.register<Exec>("nativeSmokeCompile") {
     inputs.file(rootProject.layout.projectDirectory.file("native/include/pdftools.h"))
     inputs.dir(nativeOutputDirectory)
     outputs.file(nativeSmokeExecutable)
+    onlyIf { !isWindows }
 
     doFirst {
         val outputDirectory = nativeOutputDirectory.get().asFile
@@ -138,6 +141,7 @@ tasks.register<Exec>("nativeSmoke") {
     group = "verification"
     description = "Run the C smoke test against the native shared library"
     dependsOn("nativeSmokeCompile")
+    onlyIf { !isWindows }
 
     doFirst {
         commandLine(nativeSmokeExecutable.get().asFile.absolutePath)
