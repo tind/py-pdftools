@@ -2,7 +2,38 @@
 
 This file records implementation milestones, verification results, and decisions that affect later work.
 
-## Latest milestone
+## Current milestone
+
+### M8 — PyPI description correction
+
+Status: in progress
+
+- [x] Replace transitional pre-release wording with durable installation text.
+- [x] Correct the distribution name in the specification's wheel examples.
+- [x] Reject transitional release wording in packaged wheel metadata.
+- [x] Set the patch version to 0.1.1.
+- [ ] Pass the complete five-platform wheel matrix for the release commit.
+- [ ] Publish `v0.1.1` through the protected Trusted Publishing workflow.
+- [ ] Verify the corrected public metadata and a fresh PyPI installation.
+
+This is a metadata-only patch release. The Python, Java, and native runtime
+sources are unchanged from 0.1.0. Version 0.1.0 remains functional and
+installable, so it will not be yanked or deleted.
+
+Release preparation checkpoint:
+
+- `PYTHONPATH=src ./venv/bin/python -m unittest discover -v` — 62 tests passed,
+  including the new stale-description release check; five native-only tests
+  skipped in the source-path run.
+- Built
+  `tindtechnologies_py_pdftools-0.1.1-py3-none-macosx_11_0_arm64.whl` locally.
+  Its metadata reports version 0.1.1 and Apache-2.0, includes the durable
+  README description, and contains none of the rejected transitional phrases.
+- Installed the local 0.1.1 wheel into a clean environment and passed
+  `tools/installed_wheel_smoke.py` with Java, GraalVM, source paths, and native
+  library overrides removed.
+
+## Completed milestones
 
 ### M7 — Public release
 
@@ -111,8 +142,6 @@ Post-publication metadata follow-up:
   release checklist requires that wording before tagging. Publishing a 0.1.1
   patch would make the corrected description current on PyPI; otherwise the
   next functional release will do so.
-
-## Completed milestones
 
 ### M6 — Distribution
 
@@ -411,3 +440,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Added the tag-checked reusable wheel release workflow, least-privilege PyPI Trusted Publishing job, and exact maintainer setup guide.
 - 2026-07-15: Published `v0.1.0` through the protected Trusted Publishing workflow and verified the exact five-file release on public PyPI.
 - 2026-07-15: Completed M7 and the version 0.1 specification after a fresh public-index installation passed the installed-wheel smoke test without build tools.
+- 2026-07-15: Started M8 to publish durable README metadata as version 0.1.1; runtime sources remain identical to 0.1.0.

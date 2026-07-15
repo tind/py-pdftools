@@ -46,6 +46,7 @@ class ReleaseArtifactTests(unittest.TestCase):
         wheel_tag: str,
         *,
         metadata_name: str | None = None,
+        metadata_description: str = "Install the package from PyPI.",
     ) -> Path:
         distribution = self.project_name.replace("-", "_")
         filename = f"{distribution}-{self.version}-{wheel_tag}.whl"
@@ -60,6 +61,7 @@ class ReleaseArtifactTests(unittest.TestCase):
             f"Version: {self.version}\n"
             f"License-Expression: {self.license_expression}\n"
             f"{license_headers}\n"
+            f"{metadata_description}\n"
         )
         with zipfile.ZipFile(wheel, "w") as archive:
             archive.writestr(f"{dist_info}/METADATA", metadata)
@@ -85,4 +87,12 @@ class ReleaseArtifactTests(unittest.TestCase):
     def test_rejects_incorrect_wheel_metadata(self) -> None:
         self._write_wheel(WHEEL_TAGS[0], metadata_name="wrong-project")
         with self.assertRaisesRegex(ReleaseValidationError, "wrong project name"):
+            validate_release("v0.1.0", self.project_file, self.dist_directory)
+
+    def test_rejects_a_stale_project_description(self) -> None:
+        self._write_wheel(
+            WHEEL_TAGS[0],
+            metadata_description="No package has been published to PyPI yet.",
+        )
+        with self.assertRaisesRegex(ReleaseValidationError, "stale project description"):
             validate_release("v0.1.0", self.project_file, self.dist_directory)

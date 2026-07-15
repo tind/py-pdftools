@@ -27,6 +27,11 @@ REQUIRED_LICENSE_FILES = (
     "NOTICE",
     "java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt",
 )
+FORBIDDEN_DESCRIPTION_PHRASES = (
+    "the project is pre-release",
+    "no package has been published to pypi",
+    "once the first release is published",
+)
 
 
 class ReleaseValidationError(ValueError):
@@ -88,6 +93,11 @@ def validate_release(
             if metadata["License-Expression"] != license_expression:
                 raise ReleaseValidationError(
                     f"{wheel.name} has the wrong license expression"
+                )
+            description = metadata.get_payload().casefold()
+            if any(phrase in description for phrase in FORBIDDEN_DESCRIPTION_PHRASES):
+                raise ReleaseValidationError(
+                    f"{wheel.name} has a stale project description"
                 )
             license_files = set(metadata.get_all("License-File", ()))
             if not set(REQUIRED_LICENSE_FILES).issubset(license_files):

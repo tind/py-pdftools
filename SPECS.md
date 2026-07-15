@@ -964,11 +964,11 @@ The project shall use:
 Example wheel names:
 
 ```text
-py_pdftools-0.1.0-py3-none-manylinux_2_28_x86_64.whl
-py_pdftools-0.1.0-py3-none-manylinux_2_28_aarch64.whl
-py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl
-py_pdftools-0.1.0-py3-none-macosx_10_15_x86_64.whl
-py_pdftools-0.1.0-py3-none-win_amd64.whl
+tindtechnologies_py_pdftools-0.1.0-py3-none-manylinux_2_28_x86_64.whl
+tindtechnologies_py_pdftools-0.1.0-py3-none-manylinux_2_28_aarch64.whl
+tindtechnologies_py_pdftools-0.1.0-py3-none-macosx_11_0_arm64.whl
+tindtechnologies_py_pdftools-0.1.0-py3-none-macosx_10_15_x86_64.whl
+tindtechnologies_py_pdftools-0.1.0-py3-none-win_amd64.whl
 ```
 
 The installed package shall not require:
