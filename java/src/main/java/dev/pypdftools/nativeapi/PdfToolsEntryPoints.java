@@ -1,8 +1,14 @@
 package dev.pypdftools.nativeapi;
 
+import dev.pypdftools.error.FontException;
+import dev.pypdftools.error.InvalidOcrDataException;
 import dev.pypdftools.error.InvalidPdfException;
+import dev.pypdftools.error.PageMismatchException;
 import dev.pypdftools.error.PdfPasswordRequiredException;
+import dev.pypdftools.error.PdfPermissionException;
+import dev.pypdftools.error.PdfProcessingException;
 import dev.pypdftools.inspection.PdfInspectionOperation;
+import dev.pypdftools.ocr.OcrTextLayerOperation;
 import java.nio.charset.StandardCharsets;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.UnmanagedMemory;
@@ -63,12 +69,51 @@ public final class PdfToolsEntryPoints {
             CCharPointer requestData,
             UnsignedWord requestLength,
             NativeBufferPointer output) {
-        if (output.isNonNull()) {
-            clearOutput(output);
+        if (output.isNull()) {
+            return NativeErrors.fail(
+                    NativeStatus.PDF_PROCESSING,
+                    "native OCR output pointer must not be null");
         }
-        return NativeErrors.fail(
-                NativeStatus.PDF_PROCESSING,
-                "OCR text-layer transformation is not implemented yet");
+        clearOutput(output);
+        NativeErrors.clear();
+
+        byte[] pdf;
+        try {
+            pdf = copyInput(pdfData, pdfLength, "PDF");
+        } catch (IllegalArgumentException error) {
+            return NativeErrors.fail(NativeStatus.INVALID_PDF, error);
+        }
+        byte[] request;
+        try {
+            request = copyInput(requestData, requestLength, "OCR request");
+        } catch (IllegalArgumentException error) {
+            return NativeErrors.fail(NativeStatus.INVALID_OCR_DATA, error);
+        }
+
+        try {
+            writeOutput(OcrTextLayerOperation.transform(pdf, request), output);
+            return NativeStatus.SUCCESS;
+        } catch (PageMismatchException error) {
+            return NativeErrors.fail(NativeStatus.PAGE_MISMATCH, error);
+        } catch (InvalidOcrDataException error) {
+            return NativeErrors.fail(NativeStatus.INVALID_OCR_DATA, error);
+        } catch (PdfPasswordRequiredException error) {
+            return NativeErrors.fail(NativeStatus.PDF_PASSWORD_REQUIRED, error);
+        } catch (InvalidPdfException error) {
+            return NativeErrors.fail(NativeStatus.INVALID_PDF, error);
+        } catch (PdfPermissionException error) {
+            return NativeErrors.fail(NativeStatus.PDF_PERMISSION, error);
+        } catch (FontException error) {
+            return NativeErrors.fail(NativeStatus.FONT_ERROR, error);
+        } catch (PdfProcessingException error) {
+            return NativeErrors.fail(NativeStatus.PDF_PROCESSING, error);
+        } catch (OutOfMemoryError error) {
+            return NativeErrors.fail(
+                    NativeStatus.PDF_PROCESSING,
+                    "native OCR transformation ran out of memory");
+        } catch (Throwable error) {
+            return NativeErrors.fail(NativeStatus.PDF_PROCESSING, error);
+        }
     }
 
     @CEntryPoint(name = "pdftools_free_buffer", publishAs = CEntryPoint.Publish.SymbolOnly)

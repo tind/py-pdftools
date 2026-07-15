@@ -194,9 +194,71 @@ int main(void) {
         return 6;
     }
 
+    static const uint8_t ocr_request[] =
+        "{\"schemaVersion\":1,\"options\":{"
+        "\"allowPartialDocument\":false,"
+        "\"minimumConfidence\":null,"
+        "\"debugVisibleText\":false},"
+        "\"pages\":[{\"pageIndex\":0,\"orientation\":0,\"lines\":[{"
+        "\"text\":\"Native OCR\",\"confidence\":99.0,\"bounds\":{"
+        "\"left\":0.1,\"top\":0.2,\"width\":0.5,\"height\":0.08}}]}]}";
+    output.data = NULL;
+    output.length = 0;
+    status = pdftools_add_ocr_text_layer(
+        thread,
+        pdf,
+        pdf_length,
+        ocr_request,
+        sizeof(ocr_request) - 1,
+        &output
+    );
+    if (status != 0 || output.data == NULL || output.length <= pdf_length) {
+        print_last_error(thread);
+        fprintf(stderr, "OCR transformation did not return a PDF\n");
+        return 7;
+    }
+    void *transformed_pdf = output.data;
+    size_t transformed_length = output.length;
+
+    output.data = NULL;
+    output.length = 0;
+    status = pdftools_inspect_pdf(
+        thread,
+        transformed_pdf,
+        transformed_length,
+        &output
+    );
+    int transformed_is_valid =
+        status == 0 &&
+        output.data != NULL &&
+        contains_bytes(output.data, output.length, "\"pageCount\":1");
+    pdftools_free_buffer(thread, output.data);
+    pdftools_free_buffer(thread, transformed_pdf);
+    if (!transformed_is_valid) {
+        print_last_error(thread);
+        fprintf(stderr, "transformed output could not be inspected\n");
+        return 8;
+    }
+
+    static const uint8_t invalid_request[] = "{}";
+    output.data = NULL;
+    output.length = 0;
+    status = pdftools_add_ocr_text_layer(
+        thread,
+        pdf,
+        pdf_length,
+        invalid_request,
+        sizeof(invalid_request) - 1,
+        &output
+    );
+    if (status != 2 || output.data != NULL || output.length != 0) {
+        fprintf(stderr, "malformed OCR request did not return invalid-data status\n");
+        return 9;
+    }
+
     if (graal_tear_down_isolate(thread) != 0) {
         fprintf(stderr, "could not tear down GraalVM isolate\n");
-        return 7;
+        return 10;
     }
     puts("native ABI smoke test passed");
     return 0;

@@ -2,6 +2,9 @@
   "resources": [
     {
       "glob": "dev/pypdftools/fonts/NotoSans-Regular.ttf"
+    },
+    {
+      "glob": "org/apache/fontbox/cmap/Identity-H"
     }
   ],
   "reflection": [

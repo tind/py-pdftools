@@ -4,15 +4,28 @@ This file records implementation milestones, verification results, and decisions
 
 ## Current milestone
 
-### M5 — OCR text transformation
+### M6 — Distribution
 
 Status: in progress
+
+- [ ] Stage the native library and its runtime dependencies into the Python
+  package.
+- [ ] Build and inspect a platform-specific wheel.
+- [ ] Test an installed wheel without Java or repository-path overrides.
+- [ ] Add supported-platform CI build and test jobs.
+- [ ] Complete public usage, build, and release documentation.
+
+## Completed milestones
+
+### M5 — OCR text transformation
+
+Status: complete
 
 - [x] Validate the OCR request independently in Java.
 - [x] Convert normalized OCR rectangles into PDF page coordinates.
 - [x] Fit and write invisible Unicode text without changing visible content.
 - [x] Preserve metadata, page geometry, and existing page content.
-- [ ] Exercise transformation through the native ABI and Python API.
+- [x] Exercise transformation through the native ABI and Python API.
 
 Request-schema checkpoint:
 
@@ -47,7 +60,20 @@ PDFBox transformation checkpoint:
   combination.
 - `./gradlew --offline :java:test` — 61 Java tests passed.
 
-## Completed milestones
+Native OCR checkpoint:
+
+- Connected the one-shot OCR operation to the exported C entry point with
+  stable status mapping for invalid requests/PDFs, page mismatches, passwords,
+  permissions, font failures, and PDF processing failures.
+- Native Image explicitly bundles both the OCR font and PDFBox's dynamically
+  loaded `Identity-H` CMap.
+- The C smoke test transforms a PDF, reinspects the returned bytes, frees both
+  native outputs, and verifies malformed-request status handling.
+- `./gradlew --offline :java:nativeSmoke
+  -PgraalVmHome=/opt/homebrew/opt/graalvm` — native build and C ABI smoke passed.
+- `PY_PDFTOOLS_NATIVE_LIBRARY=... PYTHONPATH=src python3 -m unittest discover
+  -v` — 57 Python tests passed, including real OCR success, page-mismatch and
+  font-error mapping, transformed-PDF reinspection, and isolate reuse.
 
 ### M4 — Native inspection path
 
@@ -70,10 +96,10 @@ context; the earlier context-free conceptual signature could not be implemented
 without internal, unsupported Native Image APIs.
 
 The shared library exports inspection, OCR, buffer-release, and error-query
-entry points. OCR currently returns a deliberate not-implemented processing
-error pending M5; inspection is complete end to end. On POSIX, Python loads the
-library with global symbol visibility because Native Image's dynamically loaded
-JDK helper libraries resolve symbols from the main image. PDFBox's filter
+entry points. At the M4 checkpoint OCR returned a deliberate not-implemented
+processing error pending M5; inspection was complete end to end. On POSIX,
+Python loads the library with global symbol visibility because Native Image's
+dynamically loaded JDK helper libraries resolve symbols from the main image. PDFBox's filter
 registry also makes headless AWT and legacy charsets reachable, so the build
 includes traced JNI metadata and all runtime charset providers.
 
@@ -201,3 +227,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Added the first M5 checkpoint with strict native OCR request decoding, independent validation, resource limits, and PDF page-matching rules.
 - 2026-07-15: Added crop-relative OCR coordinate mapping across every supported PDF rotation and OCR orientation.
 - 2026-07-15: Added the PDFBox OCR writer with fitted invisible text, a pinned embeddable font, confidence filtering, permission handling, and output-preservation tests.
+- 2026-07-15: Completed M5 by connecting OCR to the native ABI, bundling the required Native Image resources, expanding the C smoke test, and passing the real Python transformation path.

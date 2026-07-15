@@ -3,7 +3,17 @@ from __future__ import annotations
 import os
 import unittest
 
-from py_pdftools import InvalidPdfError, inspect_pdf
+from py_pdftools import (
+    FontError,
+    InvalidPdfError,
+    NormalizedRect,
+    OcrDocument,
+    OcrLine,
+    OcrPage,
+    PageMismatchError,
+    add_ocr_text_layer,
+    inspect_pdf,
+)
 from py_pdftools._runtime import _shutdown_runtime
 
 
@@ -72,6 +82,53 @@ class NativeInspectionEndToEndTests(unittest.TestCase):
         second = inspect_pdf(one_page_pdf())
 
         self.assertEqual(first, second)
+
+    def test_adds_an_ocr_layer_through_the_real_abi(self) -> None:
+        ocr = OcrDocument(
+            pages=(
+                OcrPage(
+                    page_index=0,
+                    orientation=0,
+                    lines=(
+                        OcrLine(
+                            text="Native OCR café Ω Привет",
+                            bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
+                            confidence=99.0,
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        transformed = add_ocr_text_layer(one_page_pdf(), ocr)
+
+        self.assertTrue(transformed.startswith(b"%PDF-"))
+        self.assertGreater(len(transformed), len(one_page_pdf()))
+        info = inspect_pdf(transformed)
+        self.assertEqual(info.page_count, 1)
+        self.assertEqual(info.pages[0].rotation, 90)
+        self.assertEqual(info.pages[0].crop_box.lower_left_x, 10.0)
+
+    def test_maps_real_native_page_mismatch_and_font_errors(self) -> None:
+        with self.assertRaises(PageMismatchError):
+            add_ocr_text_layer(one_page_pdf(), OcrDocument(pages=()))
+
+        unsupported = OcrDocument(
+            pages=(
+                OcrPage(
+                    page_index=0,
+                    orientation=0,
+                    lines=(
+                        OcrLine(
+                            text="Unsupported \u6f22 glyph",
+                            bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        with self.assertRaises(FontError):
+            add_ocr_text_layer(one_page_pdf(), unsupported)
 
 
 if __name__ == "__main__":
