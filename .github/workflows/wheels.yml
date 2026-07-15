@@ -127,7 +127,6 @@ jobs:
           java-version: "25"
           distribution: graalvm-community
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          cache: gradle
       - name: Install Python build tools
         run: python -m pip install "hatchling>=1.31,<2" build
       - name: Run JVM tests

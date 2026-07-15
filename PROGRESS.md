@@ -70,7 +70,8 @@ Cross-platform CI checkpoint:
 - Updated artifact uploads from `actions/upload-artifact@v4` to current v7 to
   avoid the retired Node 20 action runtime. Disabled the ineffective Gradle
   cache integration inside manylinux job containers, where it emitted an
-  empty-path warning and saved no cache.
+  empty-path warning, and on Windows, where Git's `tar.exe` failed while
+  saving; neither cache produced a reusable entry.
 
 Documentation checkpoint:
 
