@@ -8,11 +8,20 @@ This file records implementation milestones, verification results, and decisions
 
 Status: in progress
 
-- [ ] Validate the OCR request independently in Java.
+- [x] Validate the OCR request independently in Java.
 - [ ] Convert normalized OCR rectangles into PDF page coordinates.
 - [ ] Fit and write invisible Unicode text without changing visible content.
 - [ ] Preserve metadata, page geometry, and existing page content.
 - [ ] Exercise transformation through the native ABI and Python API.
+
+Request-schema checkpoint:
+
+- Added a dependency-free strict JSON and UTF-8 decoder for private request
+  schema version 1.
+- Java independently validates field types, orientations, confidence values,
+  normalized bounds, duplicate page indexes, document matching, and internal
+  request-size limits.
+- `./gradlew --offline :java:test` — 28 Java tests passed.
 
 ## Completed milestones
 
@@ -165,3 +174,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Completed M2 with native library discovery, ctypes bindings, lazy ABI-checked lifecycle management, thread serialization, public dispatch, and 51 passing tests.
 - 2026-07-15: Completed M3 with a pinned Gradle build, PDFBox 3.0.8 inspection core, schema-v1 encoder, encrypted/malformed PDF handling, and 16 Java tests.
 - 2026-07-15: Completed M4 with exported GraalVM entry points, managed native buffers and errors, a macOS ARM64 shared library build, an independent C ABI smoke test, and real Python-to-PDFBox inspection.
+- 2026-07-15: Added the first M5 checkpoint with strict native OCR request decoding, independent validation, resource limits, and PDF page-matching rules.
