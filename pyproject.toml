@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "py-pdftools"
+version = "0.1.0"
+description = "High-level PDF transformations backed by Apache PDFBox"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "py-pdftools contributors" },
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/py_pdftools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

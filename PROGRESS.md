@@ -6,13 +6,23 @@ This file records implementation milestones, verification results, and decisions
 
 ### M1 — Python public contract
 
-Status: in progress
+Status: complete
 
-- [ ] Add Python packaging metadata and a `src`-layout package.
-- [ ] Implement the public exception hierarchy.
-- [ ] Implement immutable public data models and Python-side validation.
-- [ ] Export the documented public contract.
-- [ ] Add dependency-free unit tests and run them on the available Python interpreter.
+- [x] Add Python packaging metadata and a `src`-layout package.
+- [x] Implement the public exception hierarchy.
+- [x] Implement immutable public data models and Python-side validation.
+- [x] Export the documented public contract.
+- [x] Add dependency-free unit tests and run them on the available Python interpreter.
+
+Verification:
+
+- `PYTHONPATH=src python3 -m unittest discover -v` — 26 tests passed on Python 3.14.6.
+- `python3 -m compileall -q src tests` — passed.
+- `git diff --check` — passed.
+
+The public operations currently validate their Python arguments and raise a
+clear `NativeLibraryError`; actual native dispatch is deliberately deferred to
+M2 rather than represented as operational.
 
 ## Planned milestones
 
@@ -39,3 +49,4 @@ Status: in progress
 ## Log
 
 - 2026-07-15: Read the complete specification and selected the Python public contract as the first milestone.
+- 2026-07-15: Completed M1 with package metadata, public models, validation, exceptions, API exports, typing marker, and tests.
