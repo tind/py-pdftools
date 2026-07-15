@@ -18,7 +18,9 @@ typedef struct {
     size_t length;
 } pdftools_buffer_t;
 
-uint32_t pdftools_abi_version(void);
+uint32_t pdftools_abi_version(
+    graal_isolatethread_t *thread
+);
 
 pdftools_status_t pdftools_inspect_pdf(
     graal_isolatethread_t *thread,

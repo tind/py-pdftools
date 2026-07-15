@@ -138,14 +138,14 @@ class RuntimeLifecycleTests(unittest.TestCase):
         self.assertEqual(payload["schemaVersion"], 1)
         self.assertEqual(payload["pages"][0]["lines"][0]["text"], "Searchable")
 
-    def test_rejects_an_incompatible_native_abi_before_initialization(self) -> None:
+    def test_rejects_an_incompatible_native_abi_during_initialization(self) -> None:
         backend = FakeBackend(abi_version=NATIVE_ABI_VERSION + 1)
         _set_backend_factory_for_testing(lambda: backend)
 
         with self.assertRaisesRegex(NativeLibraryError, "ABI version mismatch"):
             inspect_pdf(b"%PDF")
 
-        self.assertEqual(backend.initialize_calls, 0)
+        self.assertEqual(backend.initialize_calls, 1)
         self.assertEqual(backend.close_calls, 1)
 
     def test_shutdown_closes_the_initialized_backend_once(self) -> None:

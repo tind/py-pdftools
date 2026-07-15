@@ -39,7 +39,7 @@ class FakeNativeLibrary:
         self.detach_calls = 0
         self.teardown_calls = 0
 
-        self.pdftools_abi_version = FakeFunction(lambda: 1)
+        self.pdftools_abi_version = FakeFunction(lambda isolate_thread: 1)
         self.pdftools_inspect_pdf = FakeFunction(self._inspect_pdf)
         self.pdftools_add_ocr_text_layer = FakeFunction(self._add_ocr_text_layer)
         self.pdftools_free_buffer = FakeFunction(self._free_buffer)
@@ -162,11 +162,21 @@ class CtypesNativeBackendTests(unittest.TestCase):
             backend = CtypesNativeBackend(Path("fake-native-library"))
         return backend, library
 
+    def test_loads_native_image_with_global_symbols_on_posix(self) -> None:
+        library = FakeNativeLibrary()
+        with patch("py_pdftools._ffi.ctypes.CDLL", return_value=library) as load:
+            CtypesNativeBackend(Path("fake-native-library"))
+
+        expected_mode = (
+            ctypes.RTLD_GLOBAL if os.name == "posix" else ctypes.DEFAULT_MODE
+        )
+        load.assert_called_once_with("fake-native-library", mode=expected_mode)
+
     def test_invokes_operations_copies_results_and_frees_native_buffers(self) -> None:
         backend, library = self.create_backend()
 
-        self.assertEqual(backend.abi_version, 1)
         backend.initialize()
+        self.assertEqual(backend.abi_version, 1)
         inspection = backend.inspect_pdf(b"%PDF-input")
         transformed = backend.add_ocr_text_layer(b"%PDF-input", b'{"request":1}')
         backend.close()

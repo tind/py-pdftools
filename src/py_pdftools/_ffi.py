@@ -17,6 +17,14 @@ _NATIVE_LIBRARY_ENV = "PY_PDFTOOLS_NATIVE_LIBRARY"
 _MAX_ERROR_MESSAGE_BYTES = 1024 * 1024
 
 
+def _native_library_mode() -> int:
+    """Expose native-image runtime symbols to its dynamically loaded JDK libraries."""
+
+    if os.name == "posix":
+        return int(getattr(ctypes, "RTLD_GLOBAL", ctypes.DEFAULT_MODE))
+    return int(ctypes.DEFAULT_MODE)
+
+
 class _NativeBuffer(ctypes.Structure):
     _fields_ = [
         ("data", ctypes.c_void_p),
@@ -64,7 +72,10 @@ class CtypesNativeBackend:
     def __init__(self, library_path: Path | None = None) -> None:
         self._library_path = library_path or discover_native_library()
         try:
-            self._library = ctypes.CDLL(str(self._library_path))
+            self._library = ctypes.CDLL(
+                str(self._library_path),
+                mode=_native_library_mode(),
+            )
         except OSError as error:
             raise NativeLibraryError(
                 f"failed to load native library {self._library_path}: {error}"
@@ -85,7 +96,8 @@ class CtypesNativeBackend:
     def abi_version(self) -> int:
         """Return the ABI version reported by the loaded library."""
 
-        return int(self._pdftools_abi_version())
+        with self._attached_thread() as isolate_thread:
+            return int(self._pdftools_abi_version(isolate_thread))
 
     def initialize(self) -> None:
         """Create the process-wide GraalVM isolate used by this backend."""
@@ -171,7 +183,7 @@ class CtypesNativeBackend:
     def _bind_functions(self) -> None:
         self._pdftools_abi_version = self._bind(
             "pdftools_abi_version",
-            [],
+            [ctypes.c_void_p],
             ctypes.c_uint32,
         )
         self._pdftools_inspect_pdf = self._bind(

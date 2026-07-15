@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     implementation("org.apache.pdfbox:pdfbox:3.0.8")
+    compileOnly("org.graalvm.sdk:nativeimage:25.0.2")
 
     testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -31,4 +32,90 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+    providers.gradleProperty("nativeAgentOutput").orNull?.let { outputDirectory ->
+        jvmArgs(
+            "-agentlib:native-image-agent=" +
+                "config-output-dir=${file(outputDirectory).absolutePath}",
+        )
+    }
+}
+
+val graalVmHome = providers.gradleProperty("graalVmHome")
+    .orElse(providers.environmentVariable("GRAALVM_HOME"))
+val nativeImageCommand = graalVmHome
+    .map { file("$it/bin/native-image").absolutePath }
+    .orElse("native-image")
+val nativeOutputDirectory = layout.buildDirectory.dir("native")
+
+tasks.register<Exec>("nativeCompile") {
+    group = "build"
+    description = "Build the GraalVM shared library"
+    dependsOn(tasks.jar)
+
+    val runtimeClasspath = configurations.runtimeClasspath
+    inputs.files(tasks.jar, runtimeClasspath)
+    outputs.dir(nativeOutputDirectory)
+
+    doFirst {
+        val outputDirectory = nativeOutputDirectory.get().asFile
+        outputDirectory.mkdirs()
+        workingDir(outputDirectory)
+        commandLine(
+            nativeImageCommand.get(),
+            "--shared",
+            "-O1",
+            "-Djava.awt.headless=true",
+            "-H:+AddAllCharsets",
+            "-o",
+            "libpy_pdftools",
+            "-cp",
+            (runtimeClasspath.get() + files(tasks.jar)).asPath,
+        )
+    }
+}
+
+val nativeSmokeOutputDirectory = layout.buildDirectory.dir("native-smoke")
+val nativeSmokeExecutable = nativeSmokeOutputDirectory.map { it.file("pdftools-smoke") }
+val nativeSmokeSource = rootProject.layout.projectDirectory.file(
+    "native/smoke/inspect_smoke.c",
+)
+
+tasks.register<Exec>("nativeSmokeCompile") {
+    group = "verification"
+    description = "Compile the C smoke test against the native ABI"
+    dependsOn("nativeCompile")
+    inputs.file(nativeSmokeSource)
+    inputs.file(rootProject.layout.projectDirectory.file("native/include/pdftools.h"))
+    inputs.dir(nativeOutputDirectory)
+    outputs.file(nativeSmokeExecutable)
+
+    doFirst {
+        val outputDirectory = nativeOutputDirectory.get().asFile
+        nativeSmokeOutputDirectory.get().asFile.mkdirs()
+        commandLine(
+            "cc",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-I${rootProject.file("native/include").absolutePath}",
+            "-I${outputDirectory.absolutePath}",
+            nativeSmokeSource.asFile.absolutePath,
+            "-L${outputDirectory.absolutePath}",
+            "-lpy_pdftools",
+            "-Wl,-rpath,${outputDirectory.absolutePath}",
+            "-o",
+            nativeSmokeExecutable.get().asFile.absolutePath,
+        )
+    }
+}
+
+tasks.register<Exec>("nativeSmoke") {
+    group = "verification"
+    description = "Run the C smoke test against the native shared library"
+    dependsOn("nativeSmokeCompile")
+
+    doFirst {
+        commandLine(nativeSmokeExecutable.get().asFile.absolutePath)
+    }
 }

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "org.apache.commons.logging.impl.LogFactoryImpl",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.apache.commons.logging.impl.Jdk14Logger",
+    "allDeclaredConstructors": true
+  }
+]

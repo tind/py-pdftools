@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import py_pdftools
 from py_pdftools import (
     InvalidPdfError,
-    NativeLibraryError,
     OcrDocument,
     add_ocr_text_layer,
     inspect_pdf,
@@ -42,13 +42,26 @@ class PublicApiTests(unittest.TestCase):
 
     def test_pdf_input_accepts_all_documented_byte_types(self) -> None:
         ocr = OcrDocument(pages=())
+        inspection = (
+            b'{"schemaVersion":1,"pageCount":0,"encrypted":false,"pages":[]}'
+        )
 
-        for pdf in (b"%PDF", bytearray(b"%PDF"), memoryview(b"%PDF")):
-            with self.subTest(input_type=type(pdf).__name__):
-                with self.assertRaises(NativeLibraryError):
-                    add_ocr_text_layer(pdf, ocr)
-                with self.assertRaises(NativeLibraryError):
-                    inspect_pdf(pdf)
+        with (
+            patch(
+                "py_pdftools._api._runtime.add_ocr_text_layer",
+                return_value=b"%PDF-output",
+            ) as add_native,
+            patch(
+                "py_pdftools._api._runtime.inspect_pdf",
+                return_value=inspection,
+            ) as inspect_native,
+        ):
+            for pdf in (b"%PDF", bytearray(b"%PDF"), memoryview(b"%PDF")):
+                with self.subTest(input_type=type(pdf).__name__):
+                    self.assertEqual(add_ocr_text_layer(pdf, ocr), b"%PDF-output")
+                    self.assertEqual(inspect_pdf(pdf).page_count, 0)
+                    self.assertEqual(add_native.call_args.args[0], b"%PDF")
+                    inspect_native.assert_called_with(b"%PDF")
 
     def test_non_byte_pdf_input_is_rejected(self) -> None:
         with self.assertRaises(TypeError):

@@ -4,6 +4,55 @@ This file records implementation milestones, verification results, and decisions
 
 ## Current milestone
 
+### M5 — OCR text transformation
+
+Status: in progress
+
+- [ ] Validate the OCR request independently in Java.
+- [ ] Convert normalized OCR rectangles into PDF page coordinates.
+- [ ] Fit and write invisible Unicode text without changing visible content.
+- [ ] Preserve metadata, page geometry, and existing page content.
+- [ ] Exercise transformation through the native ABI and Python API.
+
+## Completed milestones
+
+### M4 — Native inspection path
+
+Status: complete
+
+- [x] Verify the locally installed GraalVM and Native Image toolchain.
+- [x] Adjust ABI-version checking to use a supported isolate-aware entry point.
+- [x] Implement ABI-v1 native entry points and unmanaged output buffers.
+- [x] Implement per-thread native error reporting and status mapping.
+- [x] Build and smoke-test the macOS ARM64 shared library.
+- [x] Run Python `inspect_pdf` end to end against the real native library.
+
+GraalVM Native Image 25.0.3 is available at the Homebrew prefix
+`/opt/homebrew/opt/graalvm`. The build accepts this location through the
+`graalVmHome` Gradle property and does not require global `PATH` changes.
+
+The ABI version function now receives the isolate thread and is called directly
+after isolate creation. Supported GraalVM entry points require an isolate
+context; the earlier context-free conceptual signature could not be implemented
+without internal, unsupported Native Image APIs.
+
+The shared library exports inspection, OCR, buffer-release, and error-query
+entry points. OCR currently returns a deliberate not-implemented processing
+error pending M5; inspection is complete end to end. On POSIX, Python loads the
+library with global symbol visibility because Native Image's dynamically loaded
+JDK helper libraries resolve symbols from the main image. PDFBox's filter
+registry also makes headless AWT and legacy charsets reachable, so the build
+includes traced JNI metadata and all runtime charset providers.
+
+Verification:
+
+- `./gradlew --offline :java:test` — 20 Java tests passed.
+- `./gradlew --offline :java:nativeSmoke
+  -PgraalVmHome=/opt/homebrew/opt/graalvm` — native build and C ABI smoke test passed.
+- Native smoke covers ABI negotiation, successful geometry inspection, invalid-PDF status, output release, and isolate teardown.
+- `PY_PDFTOOLS_NATIVE_LIBRARY=... PYTHONPATH=src python3 -m unittest discover -v` — 55 Python tests passed, including 3 real-library end-to-end tests.
+- The end-to-end tests cover rotated crop-box geometry, native error mapping, and repeated isolate reuse.
+
 ### M3 — Java PDF inspection
 
 Status: complete
@@ -35,8 +84,6 @@ The inspection boundary therefore reports PDFBox's normalized rotation; the
 immutable Java and Python response models independently accept only 0, 90,
 180, or 270.
 
-## Completed milestones
-
 ### M2 — Native protocol boundary
 
 Status: complete
@@ -65,9 +112,9 @@ copy/free behavior, native error retrieval, status mapping, and GraalVM thread
 attach/detach behavior. Runtime tests cover lazy reuse, ABI mismatch, shutdown,
 and serialized access from eight Python threads.
 
-No native library is bundled yet. Public calls now reach the complete Python
-boundary and then report `NativeLibraryError` until M4 supplies the GraalVM
-artifact.
+At the M2 checkpoint, no native library was bundled. Public calls reached the
+complete Python boundary and then reported `NativeLibraryError`; M4 supplied
+the first working GraalVM artifact.
 
 ### M1 — Python public contract
 
@@ -102,7 +149,7 @@ that temporary seam with native serialization and dispatch.
 - Repository began with `SPECS.md` only; commit `25c8829` is the baseline specification.
 - Python 3.14.6 is available.
 - OpenJDK 26.0.1 and Gradle 9.6.1 are available; Java output targets release 21.
-- GraalVM `native-image` is not currently available.
+- GraalVM Native Image 25.0.3 is available at `/opt/homebrew/opt/graalvm`.
 - No Python test/build tools are installed globally; M1 tests will use `unittest`.
 
 ## Decisions
@@ -117,3 +164,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Defined the M2 versioned JSON protocol and native status mapping; protocol tests also caught and fixed float drift in normalized rectangles.
 - 2026-07-15: Completed M2 with native library discovery, ctypes bindings, lazy ABI-checked lifecycle management, thread serialization, public dispatch, and 51 passing tests.
 - 2026-07-15: Completed M3 with a pinned Gradle build, PDFBox 3.0.8 inspection core, schema-v1 encoder, encrypted/malformed PDF handling, and 16 Java tests.
+- 2026-07-15: Completed M4 with exported GraalVM entry points, managed native buffers and errors, a macOS ARM64 shared library build, an independent C ABI smoke test, and real Python-to-PDFBox inspection.

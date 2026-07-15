@@ -63,13 +63,13 @@ def _get_backend() -> NativeBackend:
     candidate: NativeBackend | None = None
     try:
         candidate = _backend_factory()
+        candidate.initialize()
         actual_version = candidate.abi_version
         if actual_version != NATIVE_ABI_VERSION:
             raise NativeLibraryError(
                 "native ABI version mismatch: "
                 f"expected {NATIVE_ABI_VERSION}, got {actual_version}"
             )
-        candidate.initialize()
     except PdfToolsError:
         _close_safely(candidate)
         raise
