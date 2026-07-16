@@ -43,6 +43,8 @@ Unicode checkpoint:
   image rebuilt and the C ABI smoke test passed.
 - `PYTHONPATH=src PY_PDFTOOLS_NATIVE_LIBRARY=java/build/native/libpy_pdftools.dylib
   ./venv/bin/python -m unittest discover -v` — 63 Python tests passed.
+- Reserved version 0.1.2 for this behavioral patch; no release has been
+  published yet.
 
 ## Completed milestones
 
