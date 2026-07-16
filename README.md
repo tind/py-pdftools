@@ -81,7 +81,7 @@ Path("searchable.pdf").write_bytes(result)
 OCR bounds use normalized coordinates relative to the visible crop box after
 page rotation. The origin is at the visible top-left. `orientation` is the OCR
 text direction in that same visible coordinate system and must be one of `0`,
-`90`, `180`, or `270`.
+`90`, `180`, or `270`: `0 = right`, `90 = down`, `180 = left`, and `270 = up`.
 
 By default the OCR document must contain every PDF page exactly once. Set
 `allow_partial_document=True` to modify only supplied pages. Lines below

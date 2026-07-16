@@ -78,5 +78,7 @@ bounding boxes already use the normalized top-left coordinate convention
 expected by `py-pdftools`.
 
 For sideways scans, determine orientation from the provider's word polygons or
-your OCR pipeline and pass a mapping such as `{0: 90}`. Keep provider-specific
-orientation heuristics outside the core PDF package.
+your OCR pipeline and pass a mapping such as `{0: 90}`. Orientation uses the
+visible-page top-left coordinate system: `0 = right`, `90 = down`, `180 = left`,
+and `270 = up`. Keep provider-specific orientation heuristics outside the core
+PDF package.

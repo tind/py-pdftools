@@ -215,7 +215,9 @@ from typing import Literal, TypeAlias
 Orientation: TypeAlias = Literal[0, 90, 180, 270]
 ```
 
-Orientation describes the OCR text direction in the visible, globally rotated page coordinate system.
+Orientation describes the OCR text direction in the visible, globally rotated
+page coordinate system. That coordinate system has its origin at the visible
+page's top-left: `0 = right`, `90 = down`, `180 = left`, and `270 = up`.
 
 It does not describe the raw PDF page content-stream coordinate system.
 
@@ -467,7 +469,8 @@ OCR rectangles shall be interpreted relative to the visible page after applying:
 * The page crop box.
 * The page rotation value.
 
-This coordinate space uses a top-left origin.
+This coordinate space uses a top-left origin. OCR text direction uses
+`0 = right`, `90 = down`, `180 = left`, and `270 = up`.
 
 ### 9.2 PDF coordinate space
 

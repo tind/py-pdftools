@@ -8,6 +8,8 @@ from typing import Literal, TypeAlias, cast
 
 from ._exceptions import InvalidOcrDataError
 
+# OCR text direction in visible-page coordinates, whose origin is top-left:
+# 0 = right, 90 = down, 180 = left, and 270 = up.
 Orientation: TypeAlias = Literal[0, 90, 180, 270]
 
 _VALID_ORIENTATIONS = frozenset((0, 90, 180, 270))
@@ -124,7 +126,11 @@ class OcrLine:
 
 @dataclass(frozen=True, slots=True)
 class OcrPage:
-    """OCR lines for one zero-based PDF page index."""
+    """OCR lines and their visible-page text direction for one PDF page.
+
+    The visible-page coordinate origin is top-left. ``orientation`` follows
+    that coordinate system: 0 = right, 90 = down, 180 = left, and 270 = up.
+    """
 
     page_index: int
     orientation: Orientation

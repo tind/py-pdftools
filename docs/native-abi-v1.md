@@ -118,6 +118,10 @@ missing confidence values are JSON `null`.
 The native implementation independently validates every field and rejects
 unknown schema versions with status 2.
 
+Bounds and orientation use visible-page coordinates after crop and page
+rotation, with a top-left origin: `0 = right`, `90 = down`, `180 = left`, and
+`270 = up`.
+
 ## Inspection response schema version 1
 
 `pdftools_inspect_pdf()` returns compact UTF-8 JSON with this shape:

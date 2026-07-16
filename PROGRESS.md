@@ -4,6 +4,30 @@ This file records implementation milestones, verification results, and decisions
 
 ## Latest milestone
 
+### M9 — Orientation and Unicode fidelity
+
+Status: in progress
+
+- [x] Make the public visible-page orientation contract explicit.
+- [x] Verify 90/270-degree glyph order and placement across every page rotation.
+- [ ] Prevent font ligature substitution from changing copied Unicode text.
+- [ ] Verify exact extraction with PDFBox and an independent extractor.
+- [ ] Re-run the complete JVM, native, and Python regression suites.
+
+Orientation checkpoint:
+
+- Public model documentation, README usage, the specification, native ABI
+  documentation, and the Textract normalization example now define the same
+  visible-page top-left contract: 0 is right, 90 down, 180 left, and 270 up.
+- End-to-end PDFBox tests cover orientations 90 and 270 for page rotations 0,
+  90, 180, and 270 with a non-origin crop box. They assert supplied selection
+  order, first/last characters, cross-axis alignment, and the expected
+  first-to-last vertical direction.
+- `./gradlew java:test --tests dev.pypdftools.ocr.OcrTextLayerTransformerTest
+  --tests dev.pypdftools.ocr.PageCoordinateMapperTest` — passed.
+
+## Completed milestones
+
 ### M8 — PyPI description correction
 
 Status: complete
@@ -55,8 +79,6 @@ Public patch-release checkpoint:
   installed `tindtechnologies-py-pdftools==0.1.1` from public PyPI and selected
   the expected `py3-none-macosx_11_0_arm64` wheel. The installed-wheel smoke
   test passed without Java, GraalVM, source paths, or native overrides.
-
-## Completed milestones
 
 ### M7 — Public release
 
@@ -465,3 +487,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Completed M7 and the version 0.1 specification after a fresh public-index installation passed the installed-wheel smoke test without build tools.
 - 2026-07-15: Started M8 to publish durable README metadata as version 0.1.1; runtime sources remain identical to 0.1.0.
 - 2026-07-15: Completed M8 by publishing and verifying `v0.1.1`; PyPI now presents the durable description, and a fresh public installation passed without build tools.
+- 2026-07-16: Started M9 by documenting the visible-page orientation contract and adding end-to-end vertical glyph-order and placement coverage across all page rotations and an offset crop box.
