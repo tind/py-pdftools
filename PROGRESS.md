@@ -13,6 +13,7 @@ Status: complete
 - [x] Prevent font ligature substitution from changing copied Unicode text.
 - [x] Verify exact extraction with PDFBox and an independent extractor.
 - [x] Re-run the complete JVM, native, and Python regression suites.
+- [x] Publish and verify the 0.1.2 platform wheels.
 
 Orientation checkpoint:
 
@@ -43,8 +44,25 @@ Unicode checkpoint:
   image rebuilt and the C ABI smoke test passed.
 - `PYTHONPATH=src PY_PDFTOOLS_NATIVE_LIBRARY=java/build/native/libpy_pdftools.dylib
   ./venv/bin/python -m unittest discover -v` — 63 Python tests passed.
-- Reserved version 0.1.2 for this behavioral patch; no release has been
-  published yet.
+
+Public release checkpoint:
+
+- Pre-tag workflow run
+  [`29488041481`](https://github.com/tind/py-pdftools/actions/runs/29488041481)
+  passed the complete five-platform matrix at commit `23991d1`.
+- Published GitHub release
+  [`v0.1.2`](https://github.com/tind/py-pdftools/releases/tag/v0.1.2) from an
+  annotated tag on that exact green commit.
+- Release workflow run
+  [`29488617565`](https://github.com/tind/py-pdftools/actions/runs/29488617565)
+  rebuilt all five wheels, passed native/Python and installed-wheel tests on
+  every target, validated the exact artifact set, and published through PyPI
+  Trusted Publishing.
+- Public PyPI metadata lists exactly the five expected 0.1.2 wheels. After
+  Simple Index propagation, a clean environment installed the macOS ARM64
+  wheel and passed without Java, GraalVM, source paths, or native overrides.
+- The public wheel independently round-tripped
+  `effect office affinity efficient` exactly with pypdf 6.
 
 ## Completed milestones
 
@@ -509,3 +527,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Completed M8 by publishing and verifying `v0.1.1`; PyPI now presents the durable description, and a fresh public installation passed without build tools.
 - 2026-07-16: Started M9 by documenting the visible-page orientation contract and adding end-to-end vertical glyph-order and placement coverage across all page rotations and an offset crop box.
 - 2026-07-16: Completed M9 by preventing PDFBox GSUB ligature substitution, requiring exact PDFBox and pypdf extraction, and passing the complete JVM, native, and Python regression suites.
+- 2026-07-16: Published and verified `v0.1.2` across all five supported wheel platforms and the public PyPI index.
