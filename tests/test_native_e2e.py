@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import os
 import unittest
+from io import BytesIO
+
+from pypdf import PdfReader
 
 from py_pdftools import (
     FontError,
@@ -108,6 +111,28 @@ class NativeInspectionEndToEndTests(unittest.TestCase):
         self.assertEqual(info.page_count, 1)
         self.assertEqual(info.pages[0].rotation, 90)
         self.assertEqual(info.pages[0].crop_box.lower_left_x, 10.0)
+
+    def test_preserves_ligature_source_unicode_with_independent_extractor(self) -> None:
+        text = "effect office affinity efficient"
+        ocr = OcrDocument(
+            pages=(
+                OcrPage(
+                    page_index=0,
+                    orientation=0,
+                    lines=(
+                        OcrLine(
+                            text=text,
+                            bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        transformed = add_ocr_text_layer(one_page_pdf(), ocr)
+
+        extracted = PdfReader(BytesIO(transformed)).pages[0].extract_text()
+        self.assertEqual(extracted, text)
 
     def test_maps_real_native_page_mismatch_and_font_errors(self) -> None:
         with self.assertRaises(PageMismatchError):

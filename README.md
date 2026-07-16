@@ -87,6 +87,9 @@ By default the OCR document must contain every PDF page exactly once. Set
 `allow_partial_document=True` to modify only supplied pages. Lines below
 `minimum_confidence` are skipped; lines without confidence are retained.
 `debug_visible_text=True` renders the inserted text for placement diagnostics.
+Copied or extracted OCR text preserves the exact Unicode sequence supplied in
+each `OcrLine`, including character sequences that a font could render as a
+typographic ligature.
 
 ## Inspect page geometry
 

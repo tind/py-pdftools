@@ -90,6 +90,25 @@ class OcrTextLayerTransformerTest {
     }
 
     @Test
+    void preservesSourceUnicodeSequencesInsteadOfFontLigatures() throws Exception {
+        String text = "effect office affinity efficient";
+        byte[] output = OcrTextLayerTransformer.transform(
+                blankPdf(1, 0),
+                request(false, null, false, page(0, 0, line(text, null))));
+
+        try (PDDocument document = Loader.loadPDF(output)) {
+            assertEquals(text, new PDFTextStripper().getText(document).strip());
+
+            TextPositionCollector collector = new TextPositionCollector();
+            collector.getText(document);
+            assertEquals(text, collector.unicodeInSelectionOrder());
+            assertEquals(
+                    text.codePointCount(0, text.length()),
+                    collector.positions().size());
+        }
+    }
+
+    @Test
     void debugModeUsesVisibleFillRendering() throws Exception {
         byte[] output = OcrTextLayerTransformer.transform(
                 blankPdf(1, 0),

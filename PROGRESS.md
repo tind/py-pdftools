@@ -6,13 +6,13 @@ This file records implementation milestones, verification results, and decisions
 
 ### M9 — Orientation and Unicode fidelity
 
-Status: in progress
+Status: complete
 
 - [x] Make the public visible-page orientation contract explicit.
 - [x] Verify 90/270-degree glyph order and placement across every page rotation.
-- [ ] Prevent font ligature substitution from changing copied Unicode text.
-- [ ] Verify exact extraction with PDFBox and an independent extractor.
-- [ ] Re-run the complete JVM, native, and Python regression suites.
+- [x] Prevent font ligature substitution from changing copied Unicode text.
+- [x] Verify exact extraction with PDFBox and an independent extractor.
+- [x] Re-run the complete JVM, native, and Python regression suites.
 
 Orientation checkpoint:
 
@@ -25,6 +25,24 @@ Orientation checkpoint:
   first-to-last vertical direction.
 - `./gradlew java:test --tests dev.pypdftools.ocr.OcrTextLayerTransformerTest
   --tests dev.pypdftools.ocr.PageCoordinateMapperTest` — passed.
+
+Unicode checkpoint:
+
+- PDFBox 3.0.8 applied Noto Sans GSUB ligatures when a complete line was passed
+  to `showText`, producing U+FB00/U+FB03 `ToUnicode` entries. Its own extractor
+  compatibility-normalized those entries, while pypdf exposed the incorrect
+  underlying mappings.
+- OCR text is now emitted as code-point strings in one continuous `TJ`
+  operation. This prevents cross-character substitutions while retaining the
+  existing font metrics, fitted placement, selection order, and rendering mode.
+- PDFBox verifies both normalized extraction and the underlying per-glyph
+  Unicode sequence. A native end-to-end test uses pypdf 6 as the independent
+  extractor and requires the exact source string.
+- `./gradlew java:test` — complete Java suite passed.
+- `./gradlew java:nativeSmoke -PgraalVmHome=/opt/homebrew/opt/graalvm` — native
+  image rebuilt and the C ABI smoke test passed.
+- `PYTHONPATH=src PY_PDFTOOLS_NATIVE_LIBRARY=java/build/native/libpy_pdftools.dylib
+  ./venv/bin/python -m unittest discover -v` — 63 Python tests passed.
 
 ## Completed milestones
 
@@ -488,3 +506,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-15: Started M8 to publish durable README metadata as version 0.1.1; runtime sources remain identical to 0.1.0.
 - 2026-07-15: Completed M8 by publishing and verifying `v0.1.1`; PyPI now presents the durable description, and a fresh public installation passed without build tools.
 - 2026-07-16: Started M9 by documenting the visible-page orientation contract and adding end-to-end vertical glyph-order and placement coverage across all page rotations and an offset crop box.
+- 2026-07-16: Completed M9 by preventing PDFBox GSUB ligature substitution, requiring exact PDFBox and pypdf extraction, and passing the complete JVM, native, and Python regression suites.

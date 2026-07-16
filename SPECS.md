@@ -594,7 +594,14 @@ If a line contains characters unsupported by the selected font, the operation sh
 
 The implementation shall not silently replace unsupported characters with unrelated glyphs.
 
-### 11.4 Text shaping
+### 11.4 Unicode round-trip
+
+Copied and extracted OCR text shall preserve the exact Unicode sequence in
+`OcrLine.text`. Font shaping shall not replace source character sequences with
+presentation-form ligature code points unless the PDF's Unicode mapping expands
+the glyph back to the complete source sequence.
+
+### 11.5 Text shaping
 
 Version 0.1 guarantees ordinary left-to-right text placement.
 

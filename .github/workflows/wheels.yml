@@ -39,6 +39,7 @@ jobs:
       - name: Install Python build tools
         run: >-
           $PYTHON -m pip install "hatchling>=1.31,<2" build
+          "pypdf>=6,<7"
           "tomli>=1.2.2; python_version < '3.11'"
       - name: Run JVM tests
         run: ./gradlew :java:test
@@ -93,6 +94,7 @@ jobs:
       - name: Install Python build tools
         run: >-
           python -m pip install "hatchling>=1.31,<2" build
+          "pypdf>=6,<7"
           "tomli>=1.2.2; python_version < '3.11'"
       - name: Run JVM tests
         run: ./gradlew :java:test
@@ -137,6 +139,7 @@ jobs:
       - name: Install Python build tools
         run: >-
           python -m pip install "hatchling>=1.31,<2" build
+          "pypdf>=6,<7"
           "tomli>=1.2.2; python_version < '3.11'"
       - name: Run JVM tests
         run: .\gradlew.bat :java:test

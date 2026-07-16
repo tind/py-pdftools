@@ -200,7 +200,13 @@ public final class OcrTextLayerTransformer {
         stream.setFont(font, line.placement().fontSize());
         stream.setHorizontalScaling(line.placement().horizontalScaling());
         stream.setTextMatrix(line.placement().matrix());
-        stream.showText(line.text());
+        stream.showTextWithPositioning(codePointStrings(line.text()));
+    }
+
+    private static Object[] codePointStrings(String text) {
+        return text.codePoints()
+                .mapToObj(Character::toString)
+                .toArray();
     }
 
     private static TextPlacement fitText(
