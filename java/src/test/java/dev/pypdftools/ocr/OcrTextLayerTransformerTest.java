@@ -241,16 +241,86 @@ class OcrTextLayerTransformerTest {
     }
 
     @Test
-    void rejectsUnsupportedGlyphsInsteadOfSubstituting() throws Exception {
+    void rejectsGlyphsNoBundledFontSupportsInsteadOfSubstituting() throws Exception {
         OcrRequest request = request(
                 false,
                 null,
                 false,
-                page(0, 0, line("Unsupported \u6f22 glyph", null)));
+                page(0, 0, line("Unsupported \uD83D\uDE00 glyph", null)));
 
-        assertThrows(
+        FontException error = assertThrows(
                 FontException.class,
                 () -> OcrTextLayerTransformer.transform(blankPdf(1, 0), request));
+        assertTrue(error.getMessage().contains("U+1F600"), error.getMessage());
+    }
+
+    @Test
+    void fallsBackToUnifontForScriptsOutsideNotoSans() throws Exception {
+        String arabic = "\u0633\u0644\u0627\u0645";
+        String han = "Chinese \u6f22\u5b57";
+        String hangul = "Korean \ud55c\uad6d\uc5b4";
+        String hebrew = "Hebrew \u05e9\u05dc\u05d5\u05dd";
+        byte[] output = OcrTextLayerTransformer.transform(
+                blankPdf(1, 0),
+                request(
+                        false,
+                        null,
+                        false,
+                        page(
+                                0,
+                                0,
+                                line(arabic, new OcrBounds(0.10, 0.10, 0.30, 0.05), null),
+                                line(han, new OcrBounds(0.10, 0.30, 0.60, 0.05), null),
+                                line(hangul, new OcrBounds(0.10, 0.50, 0.60, 0.05), null),
+                                line(hebrew, new OcrBounds(0.10, 0.70, 0.60, 0.05), null))));
+
+        try (PDDocument document = Loader.loadPDF(output)) {
+            TextPositionCollector collector = new TextPositionCollector();
+            collector.getText(document);
+            assertEquals(arabic + han + hangul + hebrew, collector.unicodeInSelectionOrder());
+
+            List<PDType0Font> fonts = type0Fonts(document.getPage(0));
+            assertEquals(2, fonts.size());
+            assertTrue(fonts.stream().allMatch(PDType0Font::isEmbedded));
+            assertTrue(fonts.stream().anyMatch(font -> font.getName().contains("NotoSans")));
+            assertTrue(fonts.stream().anyMatch(font -> font.getName().contains("Unifont")));
+        }
+        assertTrue(output.length < 100_000, "fallback font was not subset: " + output.length);
+    }
+
+    @Test
+    void fitsMixedFontLinesToTheirBounds() throws Exception {
+        String text = "Name: \u0633\u0644\u0627\u0645 \u6f22\u5b57 end";
+        byte[] output = OcrTextLayerTransformer.transform(
+                blankPdf(1, 0),
+                request(false, null, false, page(0, 0, line(text, null))));
+
+        try (PDDocument document = Loader.loadPDF(output)) {
+            TextPositionCollector collector = new TextPositionCollector();
+            collector.getText(document);
+            List<TextPosition> positions = collector.positions();
+            assertEquals(text, collector.unicodeInSelectionOrder());
+
+            double left = DEFAULT_BOUNDS.left() * PDRectangle.LETTER.getWidth();
+            double right = (DEFAULT_BOUNDS.left() + DEFAULT_BOUNDS.width())
+                    * PDRectangle.LETTER.getWidth();
+            TextPosition last = positions.getLast();
+            assertEquals(left, positions.getFirst().getX(), 0.5);
+            assertEquals(right, last.getX() + last.getWidth(), 0.5);
+        }
+    }
+
+    @Test
+    void latinOnlyDocumentsDoNotEmbedTheFallbackFont() throws Exception {
+        byte[] output = OcrTextLayerTransformer.transform(
+                blankPdf(1, 0),
+                request(false, null, false, page(0, 0, line("Plain Latin text", null))));
+
+        try (PDDocument document = Loader.loadPDF(output)) {
+            List<PDType0Font> fonts = type0Fonts(document.getPage(0));
+            assertEquals(1, fonts.size());
+            assertTrue(fonts.getFirst().getName().contains("NotoSans"));
+        }
     }
 
     @Test
@@ -413,6 +483,16 @@ class OcrTextLayerTransformerTest {
             }
         }
         return modes;
+    }
+
+    private static List<PDType0Font> type0Fonts(PDPage page) throws IOException {
+        List<PDType0Font> fonts = new ArrayList<>();
+        for (var name : page.getResources().getFontNames()) {
+            if (page.getResources().getFont(name) instanceof PDType0Font font) {
+                fonts.add(font);
+            }
+        }
+        return fonts;
     }
 
     private static byte[] save(PDDocument document) throws IOException {

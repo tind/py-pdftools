@@ -134,6 +134,29 @@ class NativeInspectionEndToEndTests(unittest.TestCase):
         extracted = PdfReader(BytesIO(transformed)).pages[0].extract_text()
         self.assertEqual(extracted, text)
 
+    def test_falls_back_to_the_bundled_unifont_in_the_native_image(self) -> None:
+        # Left-to-right scripts only: pypdf reorders right-to-left runs on extraction.
+        text = "Mixed \u6f22\u5b57 \ud55c\uad6d\uc5b4 \u0e44\u0e17\u0e22 text"
+        ocr = OcrDocument(
+            pages=(
+                OcrPage(
+                    page_index=0,
+                    orientation=0,
+                    lines=(
+                        OcrLine(
+                            text=text,
+                            bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        transformed = add_ocr_text_layer(one_page_pdf(), ocr)
+
+        extracted = PdfReader(BytesIO(transformed)).pages[0].extract_text()
+        self.assertEqual(extracted, text)
+
     def test_maps_real_native_page_mismatch_and_font_errors(self) -> None:
         with self.assertRaises(PageMismatchError):
             add_ocr_text_layer(one_page_pdf(), OcrDocument(pages=()))
@@ -145,7 +168,7 @@ class NativeInspectionEndToEndTests(unittest.TestCase):
                     orientation=0,
                     lines=(
                         OcrLine(
-                            text="Unsupported \u6f22 glyph",
+                            text="Unsupported \U0001f600 glyph",
                             bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
                         ),
                     ),

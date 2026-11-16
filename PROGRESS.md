@@ -4,6 +4,48 @@ This file records implementation milestones, verification results, and decisions
 
 ## Latest milestone
 
+### M10 — Unicode fallback font
+
+Status: in progress
+
+- [x] Draw code points Noto Sans lacks with a bundled GNU Unifont fallback.
+- [x] Keep `FontError` for code points no bundled font supports.
+- [x] Embed the fallback only in documents that need it.
+- [x] Re-run the complete JVM, native, Python, and installed-wheel suites.
+- [ ] Publish and verify the next platform wheels.
+
+Fallback checkpoint:
+
+- Production OCR (file-services, 2026-11-12) failed a whole PDF with
+  `No glyph for U+0633 in font NotoSans-Regular`: one Arabic letter in one
+  Textract line. Noto Sans covers Latin, Greek, and Cyrillic only.
+- Unifont 16.0.04 covers the Basic Multilingual Plane in one file but ships
+  only CFF outlines, which PDFBox 3.0.8 refuses to embed ("True Type fonts
+  using CFF outlines are not supported"). `tools/build_unifont_ttf.py` converts
+  the outlines to TrueType and drops the layout tables; every glyph keeps its
+  code point, advance, bounds, and area. The build is byte-reproducible.
+- The font is stored gzipped (2.3 MB against 10.8 MB) and loaded into a
+  document only when a line needs it. Lines are split into runs of consecutive
+  code points that share a font; widths are summed across runs and the line
+  keeps Noto Sans metrics.
+- Per-script Noto fonts were set aside: they would take a dozen files and still
+  leave CJK, whose Noto fonts are CFF or tens of megabytes. A glyphless font
+  like Tesseract's would cover everything but makes `debug_visible_text`
+  useless and is not a `PDType0Font` load.
+- Right-to-left text is still written in logical order (section 11.5): PDFBox
+  content order is exact, while pypdf reverses Arabic runs on extraction.
+- `./gradlew :java:test` — 73 Java tests passed; with the fallback removed,
+  the two fallback tests fail.
+- `./gradlew :java:nativeSmoke -PgraalVmHome=<GraalVM CE 25.0.5>` — native
+  image rebuilt on Linux x86-64 and the C ABI smoke test passed.
+- `PYTHONPATH=src PY_PDFTOOLS_NATIVE_LIBRARY=java/build/native/libpy_pdftools.so
+  python -m unittest discover -v` — 64 Python tests passed.
+- A locally built wheel passed `tools/installed_wheel_smoke.py` with Arabic and
+  Han text. file-services' `generate_pdf` on its multipage fixture with one
+  Arabic line raised the production `FontError` on 0.1.2 and succeeded here.
+
+## Completed milestones
+
 ### M9 — Orientation and Unicode fidelity
 
 Status: complete
@@ -63,8 +105,6 @@ Public release checkpoint:
   wheel and passed without Java, GraalVM, source paths, or native overrides.
 - The public wheel independently round-tripped
   `effect office affinity efficient` exactly with pypdf 6.
-
-## Completed milestones
 
 ### M8 — PyPI description correction
 
@@ -528,3 +568,4 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-16: Started M9 by documenting the visible-page orientation contract and adding end-to-end vertical glyph-order and placement coverage across all page rotations and an offset crop box.
 - 2026-07-16: Completed M9 by preventing PDFBox GSUB ligature substitution, requiring exact PDFBox and pypdf extraction, and passing the complete JVM, native, and Python regression suites.
 - 2026-07-16: Published and verified `v0.1.2` across all five supported wheel platforms and the public PyPI index.
+- 2026-11-16: Started M10 after a single Arabic letter failed a production OCR PDF; added a GNU Unifont fallback for the rest of the Basic Multilingual Plane and passed the JVM, native, Python, and installed-wheel suites.

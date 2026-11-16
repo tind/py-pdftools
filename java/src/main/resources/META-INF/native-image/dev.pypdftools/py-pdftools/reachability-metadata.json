@@ -4,6 +4,9 @@
       "glob": "dev/pypdftools/fonts/NotoSans-Regular.ttf"
     },
     {
+      "glob": "dev/pypdftools/fonts/Unifont-Regular.ttf.gz"
+    },
+    {
       "glob": "org/apache/fontbox/cmap/Identity-H"
     }
   ],
