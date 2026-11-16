@@ -26,6 +26,7 @@ REQUIRED_LICENSE_FILES = (
     "LICENSES/PDFBOX-3.0.8.txt",
     "NOTICE",
     "java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt",
+    "java/src/main/resources/dev/pypdftools/fonts/UNIFONT-LICENSE.txt",
 )
 FORBIDDEN_DESCRIPTION_PHRASES = (
     "the project is pre-release",

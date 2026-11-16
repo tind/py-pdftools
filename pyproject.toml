@@ -14,6 +14,7 @@ license-files = [
   "NOTICE",
   "LICENSES/*",
   "java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt",
+  "java/src/main/resources/dev/pypdftools/fonts/UNIFONT-LICENSE.txt",
 ]
 authors = [
   { name = "py-pdftools contributors" },
