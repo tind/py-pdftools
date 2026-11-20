@@ -584,9 +584,7 @@ The native library shall include or otherwise provide access to a default embedd
 
 The default font shall provide broad Unicode coverage appropriate to the supported document corpus.
 
-The bundled fonts are tried in order for each code point: Noto Sans Regular, then GNU Unifont as a
-fallback covering the rest of the Basic Multilingual Plane. Line metrics come from Noto Sans. A
-fallback font is only embedded in documents whose OCR text needs it.
+The bundled font is GNU Unifont, which covers the Basic Multilingual Plane.
 
 ### 11.2 Embedding
 
@@ -594,9 +592,8 @@ The font shall be embedded or subset into the output PDF as required.
 
 ### 11.3 Missing glyphs
 
-If a line contains a character that no bundled font supports, the operation shall fail with `FontError`
-naming the code point. Characters outside the Basic Multilingual Plane, such as emoji, are among
-those not covered.
+If a line contains characters unsupported by the selected font, the operation shall fail with `FontError`.
+Characters outside the Basic Multilingual Plane, such as emoji, are among those not covered.
 
 The implementation shall not silently replace unsupported characters with unrelated glyphs.
 

@@ -3,9 +3,8 @@ Copyright 2026 py-pdftools contributors
 
 This product includes software developed by the Apache Software Foundation and
 other third parties. The applicable license texts are distributed in LICENSE,
-LICENSES/PDFBOX-3.0.8.txt,
-java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt, and
-java/src/main/resources/dev/pypdftools/fonts/UNIFONT-LICENSE.txt.
+LICENSES/PDFBOX-3.0.8.txt, and
+java/src/main/resources/dev/pypdftools/fonts/LICENSE.txt.
 
 Apache PDFBox 3.0.8
 -------------------
@@ -69,15 +68,8 @@ Copyright 2001-2026 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
 
-Bundled Noto Sans Regular font
-------------------------------
-
-Copyright 2018 The Noto Project Authors (github.com/googlei18n/noto-fonts)
-
-The bundled font is distributed under the SIL Open Font License, Version 1.1.
-
-Bundled GNU Unifont fallback font
----------------------------------
+Bundled GNU Unifont font
+------------------------
 
 Copyright (C) 1998-2025 Roman Czyborra, Paul Hardy, Qianqian Fang, Andrew
 Miller, Johnnie Weaver, David Corbett, Nils Moskopp, Rebecca Bettencourt,

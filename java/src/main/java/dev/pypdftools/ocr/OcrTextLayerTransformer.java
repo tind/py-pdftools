@@ -90,15 +90,15 @@ public final class OcrTextLayerTransformer {
             return;
         }
 
-        OcrFonts fonts = OcrFonts.load(document);
-        FontMetrics metrics = fontMetrics(fonts.primary());
+        PDType0Font font = DefaultOcrFont.load(document);
+        FontMetrics metrics = fontMetrics(font);
         for (OcrPageData pageData : request.pages()) {
             List<OcrLineData> lines = eligibleLines(pageData.lines(), request.options());
             if (lines.isEmpty()) {
                 continue;
             }
             PDPage page = document.getPage(pageData.pageIndex());
-            writePage(document, page, pageData, lines, request.options(), fonts, metrics);
+            writePage(document, page, pageData, lines, request.options(), font, metrics);
         }
     }
 
@@ -132,7 +132,7 @@ public final class OcrTextLayerTransformer {
             OcrPageData pageData,
             List<OcrLineData> lines,
             OcrOptions options,
-            OcrFonts fonts,
+            PDType0Font font,
             FontMetrics metrics)
             throws InvalidPdfException, FontException, PdfProcessingException {
         PDRectangle cropBox = page.getCropBox();
@@ -144,7 +144,7 @@ public final class OcrTextLayerTransformer {
         List<PreparedLine> preparedLines = new ArrayList<>(lines.size());
         for (OcrLineData line : lines) {
             preparedLines.add(prepareLine(
-                    fonts,
+                    font,
                     metrics,
                     cropBox,
                     rotation,
@@ -166,7 +166,7 @@ public final class OcrTextLayerTransformer {
                 stream.setNonStrokingColor(0.0f);
             }
             for (PreparedLine line : preparedLines) {
-                writeLine(stream, line);
+                writeLine(stream, font, line);
             }
             stream.endText();
         } catch (IOException | IllegalArgumentException error) {
@@ -177,7 +177,7 @@ public final class OcrTextLayerTransformer {
     }
 
     private static PreparedLine prepareLine(
-            OcrFonts fonts,
+            PDType0Font font,
             FontMetrics metrics,
             PDRectangle cropBox,
             int rotation,
@@ -188,19 +188,19 @@ public final class OcrTextLayerTransformer {
                 rotation,
                 line.bounds(),
                 pageData.orientation());
-        List<OcrFonts.TextRun> runs = fonts.runs(line.text());
-        TextPlacement placement = fitText(runs, metrics, region);
-        return new PreparedLine(runs, placement);
+        TextPlacement placement = fitText(font, metrics, line.text(), region);
+        return new PreparedLine(line.text(), placement);
     }
 
-    private static void writeLine(PDPageContentStream stream, PreparedLine line)
+    private static void writeLine(
+            PDPageContentStream stream,
+            PDType0Font font,
+            PreparedLine line)
             throws IOException {
+        stream.setFont(font, line.placement().fontSize());
         stream.setHorizontalScaling(line.placement().horizontalScaling());
         stream.setTextMatrix(line.placement().matrix());
-        for (OcrFonts.TextRun run : line.runs()) {
-            stream.setFont(run.font(), line.placement().fontSize());
-            stream.showTextWithPositioning(codePointStrings(run.text()));
-        }
+        stream.showTextWithPositioning(codePointStrings(line.text()));
     }
 
     private static Object[] codePointStrings(String text) {
@@ -210,20 +210,20 @@ public final class OcrTextLayerTransformer {
     }
 
     private static TextPlacement fitText(
-            List<OcrFonts.TextRun> runs,
+            PDType0Font font,
             FontMetrics metrics,
+            String text,
             TextRegion region)
             throws FontException {
-        double widthUnits = 0.0;
-        for (OcrFonts.TextRun run : runs) {
-            try {
-                widthUnits += run.font().getStringWidth(run.text());
-            } catch (IOException | IllegalArgumentException error) {
-                throw new FontException("OCR text could not be measured in the bundled fonts", error);
-            }
+        double widthUnits;
+        try {
+            font.encode(text);
+            widthUnits = font.getStringWidth(text);
+        } catch (IOException | IllegalArgumentException error) {
+            throw new FontException("OCR text contains a glyph unsupported by the bundled font", error);
         }
         if (!(widthUnits > 0.0) || !Double.isFinite(widthUnits)) {
-            throw new FontException("OCR text has no measurable width in the bundled fonts");
+            throw new FontException("OCR text has no measurable width in the bundled font");
         }
 
         double fontSize = region.lineThickness() * FONT_UNITS / metrics.heightUnits();
@@ -315,5 +315,5 @@ public final class OcrTextLayerTransformer {
             float horizontalScaling,
             Matrix matrix) {}
 
-    private record PreparedLine(List<OcrFonts.TextRun> runs, TextPlacement placement) {}
+    private record PreparedLine(String text, TextPlacement placement) {}
 }
