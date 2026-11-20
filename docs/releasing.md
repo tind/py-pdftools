@@ -76,7 +76,7 @@ For every wheel:
 - Confirm `Root-Is-Purelib: false`.
 - Confirm the main native library and all generated runtime helper libraries
   are under `py_pdftools/_native`.
-- Confirm the Apache, PDFBox, Noto, and notice files appear under the wheel's
+- Confirm the Apache, PDFBox, Unifont, and notice files appear under the wheel's
   `.dist-info/licenses` directory.
 - Install into a clean environment and run `tools/installed_wheel_smoke.py`
   without Java, GraalVM, `PYTHONPATH`, or `PY_PDFTOOLS_NATIVE_LIBRARY`.

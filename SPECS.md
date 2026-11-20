@@ -584,6 +584,8 @@ The native library shall include or otherwise provide access to a default embedd
 
 The default font shall provide broad Unicode coverage appropriate to the supported document corpus.
 
+The bundled font is GNU Unifont, which covers the Basic Multilingual Plane.
+
 ### 11.2 Embedding
 
 The font shall be embedded or subset into the output PDF as required.
@@ -591,6 +593,7 @@ The font shall be embedded or subset into the output PDF as required.
 ### 11.3 Missing glyphs
 
 If a line contains characters unsupported by the selected font, the operation shall fail with `FontError`.
+Characters outside the Basic Multilingual Plane, such as emoji, are among those not covered.
 
 The implementation shall not silently replace unsupported characters with unrelated glyphs.
 

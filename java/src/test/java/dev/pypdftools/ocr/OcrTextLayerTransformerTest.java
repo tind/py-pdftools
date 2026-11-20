@@ -85,8 +85,38 @@ class OcrTextLayerTransformerTest {
                             .findFirst()
                             .orElseThrow());
             assertTrue(ocrFont.isEmbedded());
-            assertTrue(ocrFont.getName().contains("NotoSans"));
+            assertTrue(ocrFont.getName().contains("Unifont"));
         }
+    }
+
+    @Test
+    void writesScriptsBeyondLatinGreekAndCyrillic() throws Exception {
+        String arabic = "\u0633\u0644\u0627\u0645";
+        String han = "Chinese \u6f22\u5b57";
+        String hangul = "Korean \ud55c\uad6d\uc5b4";
+        String hebrew = "Hebrew \u05e9\u05dc\u05d5\u05dd";
+        String thai = "Thai \u0e44\u0e17\u0e22";
+        byte[] output = OcrTextLayerTransformer.transform(
+                blankPdf(1, 0),
+                request(
+                        false,
+                        null,
+                        false,
+                        page(
+                                0,
+                                0,
+                                line(arabic, new OcrBounds(0.10, 0.10, 0.30, 0.05), null),
+                                line(han, new OcrBounds(0.10, 0.25, 0.60, 0.05), null),
+                                line(hangul, new OcrBounds(0.10, 0.40, 0.60, 0.05), null),
+                                line(hebrew, new OcrBounds(0.10, 0.55, 0.60, 0.05), null),
+                                line(thai, new OcrBounds(0.10, 0.70, 0.60, 0.05), null))));
+
+        try (PDDocument document = Loader.loadPDF(output)) {
+            TextPositionCollector collector = new TextPositionCollector();
+            collector.getText(document);
+            assertEquals(arabic + han + hangul + hebrew + thai, collector.unicodeInSelectionOrder());
+        }
+        assertTrue(output.length < 100_000, "bundled font was not subset: " + output.length);
     }
 
     @Test
@@ -246,7 +276,7 @@ class OcrTextLayerTransformerTest {
                 false,
                 null,
                 false,
-                page(0, 0, line("Unsupported \u6f22 glyph", null)));
+                page(0, 0, line("Unsupported \uD83D\uDE00 glyph", null)));
 
         assertThrows(
                 FontException.class,

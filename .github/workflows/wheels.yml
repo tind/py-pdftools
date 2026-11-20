@@ -29,6 +29,9 @@ jobs:
     env:
       PYTHON: /opt/python/cp310-cp310/bin/python
       PY_PDFTOOLS_WHEEL_PLATFORM_TAG: ${{ matrix.platform-tag }}
+      # The Gradle cache is saved from $HOME, which is /github/home in the
+      # container, while Java resolves root's home to /root.
+      GRADLE_USER_HOME: /github/home/.gradle
     steps:
       - uses: actions/checkout@v6
       - uses: graalvm/setup-graalvm@v1
@@ -36,6 +39,7 @@ jobs:
           java-version: "25"
           distribution: graalvm-community
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: gradle
       - name: Install Python build tools
         run: >-
           $PYTHON -m pip install "hatchling>=1.31,<2" build
@@ -126,6 +130,8 @@ jobs:
     runs-on: windows-2025
     env:
       PY_PDFTOOLS_WHEEL_PLATFORM_TAG: win_amd64
+      # A running daemon keeps Gradle's lock files open, so the cache cannot be saved.
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -136,6 +142,7 @@ jobs:
           java-version: "25"
           distribution: graalvm-community
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: gradle
       - name: Install Python build tools
         run: >-
           python -m pip install "hatchling>=1.31,<2" build

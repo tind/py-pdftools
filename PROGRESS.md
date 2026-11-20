@@ -4,6 +4,50 @@ This file records implementation milestones, verification results, and decisions
 
 ## Latest milestone
 
+### M10 — Basic Multilingual Plane font coverage
+
+Status: in progress
+
+- [x] Replace Noto Sans with GNU Unifont as the bundled OCR font.
+- [x] Keep `FontError` for code points outside the Basic Multilingual Plane.
+- [x] Re-run the complete JVM, native, Python, and installed-wheel suites.
+- [ ] Publish and verify the next platform wheels.
+
+Font checkpoint:
+
+- Production OCR (file-services, 2026-11-12) failed a whole PDF with
+  `No glyph for U+0633 in font NotoSans-Regular`: one Arabic letter in one
+  Textract line. Noto Sans covers Latin, Greek, and Cyrillic only.
+- Unifont 16.0.04 covers the Basic Multilingual Plane in one file, including
+  every code point Noto Sans had. A first draft kept Noto Sans and fell back to
+  Unifont per code point; review asked for a single font instead, which keeps
+  the original one-font code path unchanged.
+- Upstream publishes Unifont only with CFF outlines, which PDFBox 3.0.8 refuses
+  to embed. Unifont's own `hex2otf` writes TrueType outlines directly from the
+  upstream glyph sources (`format=truetype`), so no outline conversion script
+  is needed. The build is byte-reproducible; the recipe and checksums are in
+  `java/src/main/resources/dev/pypdftools/fonts/README.md`. Advance widths
+  match the published `.otf` for every shared code point.
+- `hex2otf` writes a format 3 `post` table without glyph names, and PDFBox logs
+  a warning for it on every font load, including from the native library.
+  `DefaultOcrFont` raises that one PDFBox logger to `SEVERE`.
+- The font is stored gzipped (2.0 MB against 9.8 MB). With GraalVM CE 25.0.1
+  on Linux x86-64 the local wheel grows from 14.8 MB to 16.5 MB.
+- Latin text in `debug_visible_text` renders in Unifont's bitmap style.
+  Right-to-left text is still written in logical order (section 11.5): PDFBox
+  content order is exact, while pypdf reverses Arabic runs on extraction.
+- `./gradlew :java:test` — 71 Java tests passed.
+- `./gradlew :java:nativeSmoke -PgraalVmHome=<GraalVM CE 25.0.1>` — native
+  image rebuilt on Linux x86-64 and the C ABI smoke test passed without
+  PDFBox warnings.
+- `PYTHONPATH=src PY_PDFTOOLS_NATIVE_LIBRARY=java/build/native/libpy_pdftools.so
+  python -m unittest discover -v` — 64 Python tests passed.
+- A locally built wheel passed `tools/installed_wheel_smoke.py` with Arabic and
+  Han text. The same Arabic, CJK, Hebrew, Thai, and Devanagari lines raised the
+  production `FontError` on the published 0.1.2 wheel and succeeded here.
+
+## Completed milestones
+
 ### M9 — Orientation and Unicode fidelity
 
 Status: complete
@@ -63,8 +107,6 @@ Public release checkpoint:
   wheel and passed without Java, GraalVM, source paths, or native overrides.
 - The public wheel independently round-tripped
   `effect office affinity efficient` exactly with pypdf 6.
-
-## Completed milestones
 
 ### M8 — PyPI description correction
 
@@ -528,3 +570,5 @@ that temporary seam with native serialization and dispatch.
 - 2026-07-16: Started M9 by documenting the visible-page orientation contract and adding end-to-end vertical glyph-order and placement coverage across all page rotations and an offset crop box.
 - 2026-07-16: Completed M9 by preventing PDFBox GSUB ligature substitution, requiring exact PDFBox and pypdf extraction, and passing the complete JVM, native, and Python regression suites.
 - 2026-07-16: Published and verified `v0.1.2` across all five supported wheel platforms and the public PyPI index.
+- 2026-11-16: Started M10 after a single Arabic letter failed a production OCR PDF; added a GNU Unifont fallback for the rest of the Basic Multilingual Plane and passed the JVM, native, Python, and installed-wheel suites.
+- 2026-11-20: Replaced the per-code-point fallback with GNU Unifont as the only bundled font, built in TrueType format with upstream `hex2otf`, and passed the JVM, native, Python, and installed-wheel suites.
