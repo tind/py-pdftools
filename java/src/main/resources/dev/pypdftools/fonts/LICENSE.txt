@@ -6,9 +6,10 @@ Bettencourt, Ho-Seok Ee, et al.
 Upstream, GNU Unifont is dual-licensed under the SIL Open Font License,
 Version 1.1, and under the GNU General Public License version 2 or later
 with the GNU font embedding exception. Unifont-Regular.ttf.gz is a
-Modified Version (TrueType outlines converted from the upstream CFF
-outlines, layout tables removed) and is distributed here under the SIL
-Open Font License, Version 1.1. Unifont declares no Reserved Font Name.
+Modified Version (built in TrueType format from the upstream glyph
+sources with the upstream hex2otf program) and is distributed here under
+the SIL Open Font License, Version 1.1. Unifont declares no Reserved
+Font Name.
 
 The SIL Open Font License version 1.1 is copied below, and is also
 available with a FAQ at http://scripts.sil.org/OFL.
