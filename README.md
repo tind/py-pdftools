@@ -117,10 +117,14 @@ coordinates themselves remain in PDF user space.
 - Existing page streams are preserved and the OCR layer is appended.
 - Normal OCR text uses PDF rendering mode 3 (neither fill nor stroke), while
   remaining searchable and extractable.
-- Noto Sans is subset and embedded. Unsupported characters raise `FontError`
-  instead of being silently replaced.
+- GNU Unifont is subset and embedded. It covers the whole Basic Multilingual
+  Plane (Latin, Greek, Cyrillic, Arabic, Hebrew, Indic, Thai, CJK, Hangul,
+  ...). Characters outside it, such as emoji, raise `FontError` instead of
+  being silently replaced.
 - Ordinary left-to-right text is supported. Advanced bidirectional and complex
-  script shaping is not guaranteed in version 0.1.
+  script shaping is not guaranteed in version 0.1: right-to-left text is
+  written in its logical order, so extractors that reorder right-to-left runs
+  (pypdf, for example) return those runs reversed.
 - The library consumes OCR results; it does not render pages or run an OCR
   engine.
 - Password input is not supported. PDFs requiring a password raise
@@ -133,7 +137,7 @@ permissions, native loading, and PDF processing failures.
 
 ## License
 
-Project code is licensed under the Apache License 2.0. The bundled Noto Sans
+Project code is licensed under the Apache License 2.0. The bundled GNU Unifont
 font is licensed separately under the SIL Open Font License 1.1. See
 [`LICENSE`](https://github.com/tind/py-pdftools/blob/main/LICENSE),
 [`NOTICE`](https://github.com/tind/py-pdftools/blob/main/NOTICE), and the

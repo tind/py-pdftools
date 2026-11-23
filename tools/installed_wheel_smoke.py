@@ -58,7 +58,7 @@ def main() -> None:
                 orientation=0,
                 lines=(
                     OcrLine(
-                        text="Installed wheel OCR café Ω Привет",
+                        text="Installed wheel OCR café Ω Привет \u0633\u0644\u0627\u0645 \u6f22\u5b57",
                         bounds=NormalizedRect(0.1, 0.2, 0.6, 0.08),
                         confidence=99.0,
                     ),
